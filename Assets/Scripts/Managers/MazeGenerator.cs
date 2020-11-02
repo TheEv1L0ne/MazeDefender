@@ -4,77 +4,65 @@ using UnityEngine;
 
 public class MazeGenerator
 {
-    private int[,] maze;
+    private int[,] _maze;
 
     public MazeGenerator()
     {
-        
+
     }
 
     public void GenerateMaze(int width, int height)
     {
-        maze = new int[width, height];
+        _maze = new int[width, height];
         for (int i = 0; i < width; i++)
         {
             for (int j = 0; j < height; j++)
             {
-                maze[i, j] = 0;
+                _maze[i, j] = 0;
             }
         }
 
-        RecursiveDivision(maze, maze.GetLength(0), maze.GetLength(1));
-        PrintMaze(maze);
+        RecursiveDivision(_maze.GetLength(0), _maze.GetLength(1));
+        PrintMaze(_maze);
     }
 
-    private void RecursiveDivision(int [,] maze, int xMax,  int yMax, int xMin = 0, int yMin = 0)
+    private void RecursiveDivision(int xMax, int yMax, int xMin = 0, int yMin = 0)
     {
-        //yield return new WaitForSeconds(1f);
+        int[,] mazeTmp = _maze;
 
-        int[,] mazeT = maze;
-
-        if (xMax < 0 && xMin < 0 && yMax < 0 && yMin < 0)
-            return;
+        //if (xMax < 0 && xMin < 0 && yMax < 0 && yMin < 0)
+        //    return;
 
         if (xMax - xMin < 2 || yMax - yMin < 2)
         {
             return;
         }
 
-        var isHorizontal = Random.Range(0, 2) % 2 == 0 ? true : false;
+        // 0 -> Horizontal
+        // 1 -> Vertial
+        var isHorizontal = Random.Range(0, 2) == 0;
 
-        int pIndex;
-        int wIndex;
+        int wallIndex = isHorizontal ? GenerateIndex(xMin + 1, xMax - 1) : GenerateIndex(yMin + 1, yMax - 1);
+        int passageIndex = isHorizontal ? GenerateIndex(yMin, yMax) : GenerateIndex(xMin, xMax);
 
-        if (isHorizontal)
-        {
-            wIndex = Wall(xMin + 1, xMax - 1);
-            pIndex = Wall(yMin, yMax);
-
-        }
-        else
-        {
-            wIndex = Wall(yMin + 1, yMax - 1);
-            pIndex = Wall(xMin, xMax);
-        }
-
-        mazeT = BuildWall(mazeT, isHorizontal, wIndex, pIndex, xMax, yMax, xMin, yMin);
+        _maze = BuildWall(mazeTmp, isHorizontal, wallIndex, passageIndex, xMax, yMax, xMin, yMin);
 
         if (isHorizontal)
         {
             // Top and Bottom areas
-            RecursiveDivision(mazeT, xMax: wIndex - 1, yMax, xMin, yMin);
-            RecursiveDivision(mazeT, xMax, yMax, xMin: wIndex + 1, yMin);
+            RecursiveDivision(xMax: wallIndex - 1, yMax, xMin, yMin);
+            RecursiveDivision(xMax, yMax, xMin: wallIndex + 1, yMin);
 
         }
         else
         {
             // Left and Right areas
-            RecursiveDivision(mazeT, xMax, yMax: wIndex -1, xMin, yMin);
-            RecursiveDivision(mazeT, xMax, yMax, xMin, yMin: wIndex +1);
+            RecursiveDivision(xMax, yMax: wallIndex - 1, xMin, yMin);
+            RecursiveDivision(xMax, yMax, xMin, yMin: wallIndex + 1);
         }
     }
 
-    private int Wall(int startIndex, int endIdex)
+    private int GenerateIndex(int startIndex, int endIdex)
     {
         return Random.Range(startIndex, endIdex);
     }
@@ -86,8 +74,8 @@ public class MazeGenerator
 
         for (int i = (isHorizontal ? yMin : xMin); i < (isHorizontal ? yMax : xMax); i++)
         {
-                if (i == passageIndex)
-                    continue;
+            if (i == passageIndex)
+                continue;
 
             if (isHorizontal)
                 maze[wallindex, i] = 7;
@@ -107,7 +95,7 @@ public class MazeGenerator
         {
             for (int j = 0; j < maze.GetLength(1); j++)
             {
-                output += $"{(maze[i, j] == 0 ? ("<color=red>" + maze[i, j] + "</color>" ) : (maze[i, j]).ToString())} ";
+                output += $"{(maze[i, j] == 0 ? ("<color=red>" + maze[i, j] + "</color>") : (maze[i, j]).ToString())} ";
             }
 
             output += "\n";
