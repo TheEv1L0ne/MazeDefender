@@ -4,31 +4,37 @@ using UnityEngine;
 
 public class MazeGenerator
 {
-    private int[,] _maze;
+    private Maze _maze;
 
     public MazeGenerator()
     {
 
     }
 
-    public void GenerateMaze(int width, int height)
+    public Maze GenerateMaze(int width = 0, int height = 0)
     {
-        _maze = new int[width, height];
+        _maze = new Maze
+        {
+            mazeMatrix = new int[width, height]
+        };
+
         for (int i = 0; i < width; i++)
         {
             for (int j = 0; j < height; j++)
             {
-                _maze[i, j] = 0;
+                _maze.mazeMatrix[i, j] = 0;
             }
         }
 
-        RecursiveDivision(_maze.GetLength(0), _maze.GetLength(1));
-        PrintMaze(_maze);
+        RecursiveDivision(_maze.mazeMatrix.GetLength(0), _maze.mazeMatrix.GetLength(1));
+        PrintMaze(_maze.mazeMatrix);
+
+        return _maze;
     }
 
     private void RecursiveDivision(int xMax, int yMax, int xMin = 0, int yMin = 0)
     {
-        int[,] mazeTmp = _maze;
+        int[,] mazeTmp = _maze.mazeMatrix;
 
         //if (xMax < 0 && xMin < 0 && yMax < 0 && yMin < 0)
         //    return;
@@ -45,7 +51,7 @@ public class MazeGenerator
         int wallIndex = isHorizontal ? GenerateIndex(xMin + 1, xMax - 1) : GenerateIndex(yMin + 1, yMax - 1);
         int passageIndex = isHorizontal ? GenerateIndex(yMin, yMax) : GenerateIndex(xMin, xMax);
 
-        _maze = BuildWall(mazeTmp, isHorizontal, wallIndex, passageIndex, xMax, yMax, xMin, yMin);
+        _maze.mazeMatrix = BuildWall(mazeTmp, isHorizontal, wallIndex, passageIndex, xMax, yMax, xMin, yMin);
 
         if (isHorizontal)
         {

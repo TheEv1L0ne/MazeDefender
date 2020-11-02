@@ -4,8 +4,9 @@ using UnityEngine;
 
 public class MazeGeneratorManager : Singleton<MazeGeneratorManager>
 {
+    private Maze _maze;
 
-    private MazeGenerator generator;
+    public Maze Maze { get => _maze;}
 
     protected override void OnAwake()
     {
@@ -16,7 +17,7 @@ public class MazeGeneratorManager : Singleton<MazeGeneratorManager>
 
     private void Start()
     {
-        generator = new MazeGenerator();
-        generator.GenerateMaze(20 , 40);
+        MazeGenerator generator = new MazeGenerator();
+        _maze = generator.GenerateMaze(20 , 40);
     }
 }
