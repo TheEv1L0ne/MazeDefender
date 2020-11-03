@@ -22,6 +22,38 @@ public class MazeManager : Singleton<MazeManager>
 
         MazeGraphicsGenerator mazeGraphics = new MazeGraphicsGenerator();
         mazeGraphics.GenerateMazeGraphics(_maze, _mazeGraphicsHolder);
+
+        MazeNode startNode = GetEmptyTile();
+        MazeNode endNode = GetEmptyTile();
+
+        AStarPathfinding aStar = new AStarPathfinding();
+        aStar.InitPathfinder(_maze, startNode, endNode);
+        aStar.FindPath();
+        aStar.GenerateMazeGraphics(_mazeGraphicsHolder);
+    }
+
+    private MazeNode GetEmptyTile()
+    {
+        bool spawnLocGood = false;
+
+        int x = -1;
+        int y = -1;
+
+        while (!spawnLocGood)
+        {
+            x = Random.Range(0, _maze.mazeMatrix.GetLength(0));
+            y = Random.Range(0, _maze.mazeMatrix.GetLength(1));
+
+            if (_maze.mazeMatrix[x, y].Walkable)
+            {
+                spawnLocGood = true;
+                return _maze.mazeMatrix[x, y];
+
+            }
+        }
+
+        return null;
+
     }
 
     public void PlayerGraphics(int x, int y)
