@@ -19,7 +19,7 @@ public class MazeManager : Singleton<MazeManager>
     private void Start()
     {
         MazeGenerator generator = new MazeGenerator();
-        _maze = generator.GenerateMaze(20 , 40);
+        _maze = generator.GenerateMaze(100 , 50);
 
         MazeGraphicsGenerator mazeGraphics = new MazeGraphicsGenerator();
         mazeGraphics.GenerateMazeGraphics(_maze, _mazeGraphicsHolder);

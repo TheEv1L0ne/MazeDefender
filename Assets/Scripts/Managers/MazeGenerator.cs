@@ -27,12 +27,12 @@ public class MazeGenerator
         }
 
         RecursiveDivision(_maze.mazeMatrix.GetLength(0), _maze.mazeMatrix.GetLength(1));
-        PrintMaze(_maze.mazeMatrix);
+        //PrintMaze(_maze.mazeMatrix);
 
         return _maze;
     }
 
-    private void RecursiveDivision(int xMax, int yMax, int xMin = 0, int yMin = 0)
+    private void RecursiveDivision(int xMax, int yMax, int xMin = 0, int yMin = 0, bool isHorizontal = true)
     {
         int[,] mazeTmp = _maze.mazeMatrix;
 
@@ -46,7 +46,7 @@ public class MazeGenerator
 
         // 0 -> Horizontal
         // 1 -> Vertial
-        var isHorizontal = Random.Range(0, 2) == 0;
+        //var isHorizontal = Random.Range(0, 2) == 0;
 
         int wallIndex = isHorizontal ? GenerateIndex(xMin + 1, xMax - 1) : GenerateIndex(yMin + 1, yMax - 1);
         int passageIndex = isHorizontal ? GenerateIndex(yMin, yMax) : GenerateIndex(xMin, xMax);
@@ -56,15 +56,15 @@ public class MazeGenerator
         if (isHorizontal)
         {
             // Top and Bottom areas
-            RecursiveDivision(xMax: wallIndex - 1, yMax, xMin, yMin);
-            RecursiveDivision(xMax, yMax, xMin: wallIndex + 1, yMin);
+            RecursiveDivision(xMax: wallIndex - 1, yMax, xMin, yMin, !isHorizontal);
+            RecursiveDivision(xMax, yMax, xMin: wallIndex + 1, yMin ,!isHorizontal);
 
         }
         else
         {
             // Left and Right areas
-            RecursiveDivision(xMax, yMax: wallIndex - 1, xMin, yMin);
-            RecursiveDivision(xMax, yMax, xMin, yMin: wallIndex + 1);
+            RecursiveDivision(xMax, yMax: wallIndex - 1, xMin, yMin, !isHorizontal);
+            RecursiveDivision(xMax, yMax, xMin, yMin: wallIndex + 1, !isHorizontal);
         }
     }
 

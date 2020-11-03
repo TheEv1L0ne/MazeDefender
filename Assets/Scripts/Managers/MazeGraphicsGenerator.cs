@@ -13,7 +13,7 @@ public class MazeGraphicsGenerator
                 GameObject tile = TilePoolManager.Instance.GetTileFromPool();
                 tile.transform.parent = mazeHolder;
 
-                tile.transform.position = new Vector3(i, j, 0f);
+                tile.transform.position = new Vector3(i, -j, 0f);
 
                 if(maze.mazeMatrix[i,j] == 7)
                 {
