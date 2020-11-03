@@ -2,11 +2,12 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class MazeGeneratorManager : Singleton<MazeGeneratorManager>
+public class MazeManager : Singleton<MazeManager>
 {
     private Maze _maze;
-
     public Maze Maze { get => _maze;}
+
+    [SerializeField] private Transform mazeGraphicsHolder;
 
     protected override void OnAwake()
     {
