@@ -12,16 +12,23 @@ public class MazeManager : Singleton<MazeManager>
     protected override void OnAwake()
     {
         base.OnAwake();
-
-        Debug.Log($"--->> AWAKE");
     }
 
-    private void Start()
-    {
-        MazeGenerator generator = new MazeGenerator();
-        _maze = generator.GenerateMaze(100 , 50);
+    public void GenerateMaze()
+    {     
+        _maze = new Maze();
+        _maze.InitMaze(50, 40);
+        _maze.GenerateRandomMaze();
 
         MazeGraphicsGenerator mazeGraphics = new MazeGraphicsGenerator();
         mazeGraphics.GenerateMazeGraphics(_maze, _mazeGraphicsHolder);
+    }
+
+    public void PlayerGraphics(int x, int y)
+    {
+        Debug.Log($"_mazeGraphicsHolder count = {_mazeGraphicsHolder.childCount}");
+        Debug.Log($"{x * _maze.mazeMatrix.GetLength(1) + y}");
+        Transform gameObject = _mazeGraphicsHolder.GetChild(x * _maze.mazeMatrix.GetLength(1) + y);
+        gameObject.GetComponent<SpriteRenderer>().color = Color.blue;
     }
 }

@@ -15,7 +15,7 @@ public class MazeGraphicsGenerator
 
                 tile.transform.position = new Vector3(i, -j, 0f);
 
-                if(maze.mazeMatrix[i,j] == 7)
+                if(maze.mazeMatrix[i,j].Walkable == false)
                 {
                     tile.GetComponent<SpriteRenderer>().color = Color.red;
                 }

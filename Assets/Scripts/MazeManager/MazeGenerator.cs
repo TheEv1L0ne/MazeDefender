@@ -1,45 +1,33 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using UnityEditor.Experimental.UIElements.GraphView;
 using UnityEngine;
 
 public class MazeGenerator
 {
     private Maze _maze;
-
+    private int _mazeDensity;
     public MazeGenerator()
     {
 
     }
 
-    public Maze GenerateMaze(int width = 0, int height = 0)
+    public MazeNode[,] GenerateMaze(Maze maze, int mazeDensity = 5)
     {
-        _maze = new Maze
-        {
-            mazeMatrix = new int[width, height]
-        };
-
-        for (int i = 0; i < width; i++)
-        {
-            for (int j = 0; j < height; j++)
-            {
-                _maze.mazeMatrix[i, j] = 0;
-            }
-        }
-
-        RecursiveDivision(_maze.mazeMatrix.GetLength(0), _maze.mazeMatrix.GetLength(1));
+        _mazeDensity = mazeDensity;
+        _maze = maze;
+        RecursiveDivision(_maze.MazeSizeX, _maze.MazeSizeY);
         //PrintMaze(_maze.mazeMatrix);
 
-        return _maze;
+        return _maze.mazeMatrix;
     }
 
     private void RecursiveDivision(int xMax, int yMax, int xMin = 0, int yMin = 0, bool isHorizontal = true)
     {
-        int[,] mazeTmp = _maze.mazeMatrix;
+        MazeNode[,] mazeTmp = _maze.mazeMatrix;
 
-        //if (xMax < 0 && xMin < 0 && yMax < 0 && yMin < 0)
-        //    return;
 
-        if (xMax - xMin < 2 || yMax - yMin < 2)
+        if (xMax - xMin < _mazeDensity || yMax - yMin < _mazeDensity)
         {
             return;
         }
@@ -73,10 +61,10 @@ public class MazeGenerator
         return Random.Range(startIndex, endIdex);
     }
 
-    private int[,] BuildWall(int[,] maze, bool isHorizontal, int wallindex, int passageIndex,
+    private MazeNode[,] BuildWall(MazeNode[,] maze, bool isHorizontal, int wallindex, int passageIndex,
         int xMax, int yMax, int xMin, int yMin)
     {
-        int[,] mazeT = maze;
+        MazeNode[,] mazeT = maze;
 
         for (int i = (isHorizontal ? yMin : xMin); i < (isHorizontal ? yMax : xMax); i++)
         {
@@ -84,24 +72,24 @@ public class MazeGenerator
                 continue;
 
             if (isHorizontal)
-                maze[wallindex, i] = 7;
+                maze[wallindex, i].Walkable = false;
             else
-                maze[i, wallindex] = 7;
+                maze[i, wallindex].Walkable = false;
         }
 
         return mazeT;
     }
 
-    private void PrintMaze(int[,] maze)
+    private void PrintMaze(MazeNode[,] maze)
     {
 
         string output = "";
 
-        for (int i = 0; i < maze.GetLength(0); i++)
+        for (int i = 0; i < _maze.MazeSizeX; i++)
         {
-            for (int j = 0; j < maze.GetLength(1); j++)
+            for (int j = 0; j < _maze.MazeSizeY; j++)
             {
-                output += $"{(maze[i, j] == 0 ? ("<color=red>" + maze[i, j] + "</color>") : (maze[i, j]).ToString())} ";
+                output += $"{(maze[i, j].Walkable ? ("<color=red>" + maze[i, j] + "</color>") : (maze[i, j]).ToString())} ";
             }
 
             output += "\n";

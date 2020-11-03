@@ -8,11 +8,40 @@ public class GameManager : Singleton<GameManager>
     void Start()
     {
         
+        MazeManager.Instance.GenerateMaze();
+        Maze maze = MazeManager.Instance.Maze;
+        SpawnPlayer(maze);
+
+        StartCoroutine(GameLoop());
     }
 
-    // Update is called once per frame
-    void Update()
+    private IEnumerator GameLoop()
     {
-        
+        while(true)
+        {
+            yield return null;
+        }
+    }
+
+    private void SpawnPlayer(Maze maze)
+    {
+        bool spawnLocGood = false;
+
+        int x = -1;
+        int y = -1;
+
+        while (!spawnLocGood)
+        {
+            x = Random.Range(0, maze.mazeMatrix.GetLength(0));
+            y = Random.Range(0, maze.mazeMatrix.GetLength(1));
+
+            if (maze.mazeMatrix[x,y].Walkable)
+            {
+                spawnLocGood = true;
+            }
+        }
+
+        MazeManager.Instance.PlayerGraphics(x, y);
+
     }
 }
