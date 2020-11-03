@@ -7,7 +7,7 @@ public class MazeManager : Singleton<MazeManager>
     private Maze _maze;
     public Maze Maze { get => _maze;}
 
-    [SerializeField] private Transform mazeGraphicsHolder;
+    [SerializeField] private Transform _mazeGraphicsHolder;
 
     protected override void OnAwake()
     {
@@ -22,6 +22,6 @@ public class MazeManager : Singleton<MazeManager>
         _maze = generator.GenerateMaze(20 , 40);
 
         MazeGraphicsGenerator mazeGraphics = new MazeGraphicsGenerator();
-        mazeGraphics.GenerateMazeGraphics(_maze, mazeGraphicsHolder);
+        mazeGraphics.GenerateMazeGraphics(_maze, _mazeGraphicsHolder);
     }
 }

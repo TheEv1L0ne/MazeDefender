@@ -246,7 +246,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f590393e27400d846a63e0601fd0005a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  mazeGraphicsHolder: {fileID: 119826843}
+  _persistent: 1
+  _mazeGraphicsHolder: {fileID: 119826843}
 --- !u!1 &2045964118
 GameObject:
   m_ObjectHideFlags: 0
@@ -402,6 +403,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1a275e7dca35fcd4eb22683da168a640, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _persistent: 1
   _tilePrefab: {fileID: 7423865341328578934, guid: 1222f7d1e35c1dd479a7cd0b23898411,
     type: 3}
   _poolHolder: {fileID: 2045964119}
