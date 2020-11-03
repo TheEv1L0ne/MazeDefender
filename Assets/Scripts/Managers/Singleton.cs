@@ -1,25 +1,74 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Reflection;
 using UnityEngine;
 
-public class Singleton<T> : MonoBehaviour
+public abstract class Singleton<T> : Singleton where T : MonoBehaviour
 {
-    public static Singleton<T> Instance = null;
+    #region  Fields
+    private static T _instance;
+
+    private static readonly object Lock = new object();
+
+    [SerializeField]
+    private bool _persistent = true;
+    #endregion
+    static Singleton()
+    {
+    }
+
+    public static T Instance
+    {
+        get
+        {
+            if (Quitting)
+            {
+                return null;
+            }
+            lock (Lock)
+            {
+                if (_instance != null)
+                    return _instance;
+                var instances = FindObjectsOfType<T>();
+                var count = instances.Length;
+                if (count > 0)
+                {
+                    if (count == 1)
+                        return _instance = instances[0];
+                   
+                    for (var i = 1; i < instances.Length; i++)
+                        Destroy(instances[i]);
+
+                    return _instance = instances[0];
+                }
+
+                return _instance = new GameObject($"({nameof(Singleton)}){typeof(T)}")
+                           .AddComponent<T>();
+            }
+        }
+    }
 
     private void Awake()
     {
-        if(Instance != null)
-        {
-            Destroy(this.gameObject);
-        }
-        else
-        {
-            Instance = this;
-            DontDestroyOnLoad(this);
-        }
-
+        if (_persistent)
+            DontDestroyOnLoad(gameObject);
         OnAwake();
     }
 
     protected virtual void OnAwake() { }
+}
+
+public abstract class Singleton : MonoBehaviour
+{
+    #region  Properties
+    public static bool Quitting { get; private set; }
+    #endregion
+
+    #region  Methods
+    private void OnApplicationQuit()
+    {
+        Quitting = true;
+    }
+    #endregion
 }
