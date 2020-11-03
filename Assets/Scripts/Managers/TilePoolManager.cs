@@ -25,7 +25,7 @@ public class TilePoolManager : Singleton<TilePoolManager>
             _poolObjectList = new List<GameObject>();
             for (int p = 0; p < _initPoolSize; p++)
             {
-                AddNewTileToPool();
+                AddAndReturnNewTileToPool();
             }
         }
     }
@@ -39,6 +39,17 @@ public class TilePoolManager : Singleton<TilePoolManager>
         _poolObjectList.Add(poolObj);
     }
 
+    private GameObject AddAndReturnNewTileToPool()
+    {
+        GameObject poolObj = Instantiate(_tilePrefab, Vector3.zero, Quaternion.identity);
+        poolObj.SetActive(false);
+        poolObj.transform.parent = _poolHolder;
+
+        _poolObjectList.Add(poolObj);
+
+        return poolObj;
+    }
+
     public GameObject GetTileFromPool()
     {
         foreach (var tile in _poolObjectList)
@@ -50,9 +61,9 @@ public class TilePoolManager : Singleton<TilePoolManager>
             }
         }
 
-        AddNewTileToPool();
-
-        return null;
+        GameObject newTile = AddAndReturnNewTileToPool();
+        newTile.SetActive(true);
+        return newTile;
     }
 
 
