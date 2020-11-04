@@ -14,8 +14,9 @@ public class MazeGraphicsGenerator
                 tile.transform.parent = mazeHolder;
 
                 tile.transform.position = new Vector3(i, -j, 0f);
+                maze.mazeMatrix[i, j].NodePosition = tile.transform.position;
 
-                if(maze.mazeMatrix[i,j].Walkable == false)
+                if (maze.mazeMatrix[i,j].Walkable == false)
                 {
                     tile.GetComponent<SpriteRenderer>().color = Color.red;
                 }

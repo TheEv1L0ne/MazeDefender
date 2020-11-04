@@ -6,6 +6,7 @@ public class MazeManager : Singleton<MazeManager>
 {
     private Maze _maze;
     public Maze Maze { get => _maze;}
+    public Transform MazeGraphicsHolder { get => _mazeGraphicsHolder;}
 
     [SerializeField] private Transform _mazeGraphicsHolder;
 
@@ -22,17 +23,9 @@ public class MazeManager : Singleton<MazeManager>
 
         MazeGraphicsGenerator mazeGraphics = new MazeGraphicsGenerator();
         mazeGraphics.GenerateMazeGraphics(_maze, _mazeGraphicsHolder);
-
-        MazeNode startNode = GetEmptyTile();
-        MazeNode endNode = GetEmptyTile();
-
-        AStarPathfinding aStar = new AStarPathfinding();
-        aStar.InitPathfinder(_maze, startNode, endNode);
-        aStar.FindPath();
-        aStar.GenerateMazeGraphics(_mazeGraphicsHolder);
     }
 
-    private MazeNode GetEmptyTile()
+    private MazeNode GetTile()
     {
         bool spawnLocGood = false;
 
@@ -53,7 +46,6 @@ public class MazeManager : Singleton<MazeManager>
         }
 
         return null;
-
     }
 
     public void PlayerGraphics(int x, int y)

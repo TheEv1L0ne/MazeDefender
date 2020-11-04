@@ -4,12 +4,15 @@ using UnityEngine;
 
 public class AStarPathfinding : PathFinding
 {
-    private List<MazeNode> openSet = new List<MazeNode>();
-    private HashSet<MazeNode> closedSet = new HashSet<MazeNode>();
+    private List<MazeNode> openSet;
+    private HashSet<MazeNode> closedSet;
 
     public override void FindPath()
     {
-        openSet.Add(startNode);
+		openSet = new List<MazeNode>();
+		closedSet = new HashSet<MazeNode>();
+
+		openSet.Add(startNode);
 
 		while (openSet.Count > 0)
 		{
@@ -48,6 +51,11 @@ public class AStarPathfinding : PathFinding
 
 					if (!openSet.Contains(neighbour))
 						openSet.Add(neighbour);
+					else
+                    {
+						int index = openSet.IndexOf(neighbour);
+						openSet[index] = neighbour;
+                    }
 				}
 			}
 		}
@@ -68,6 +76,11 @@ public class AStarPathfinding : PathFinding
 		this.path = path;
 	}
 
+	public List<MazeNode> GetPath()
+    {
+		return path;
+    }
+
 	private int GetDistance(MazeNode nodeA, MazeNode nodeB)
 	{
 		int dstX = Mathf.Abs(nodeA.NodeX - nodeB.NodeX);
@@ -80,6 +93,7 @@ public class AStarPathfinding : PathFinding
 
 	public void GenerateMazeGraphics(Transform mazeHolder)
 	{
+		if(path != null)
         foreach (var mazeNode in path)
         {
 			mazeHolder.GetChild(mazeNode.NodeX * _maze.MazeSizeY + mazeNode.NodeY).GetComponent<SpriteRenderer>().color = Color.magenta;
