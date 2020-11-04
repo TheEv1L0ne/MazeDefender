@@ -90,7 +90,7 @@ public class GameManager : Singleton<GameManager>
             startNode = path[i];
 
             float step = 0;
-            float speed = 1f;
+            float speed = 5f;
 
             while (spawnedPlayer.transform.position != destinationPos)
             {

@@ -8,10 +8,10 @@ public class CameraManager : Singleton<CameraManager>
 
     public Camera MainCamera { get => _mainCamera;}
 
-    float left;
-    float top;
-    float right;
-    float bottom;
+    private float _left;
+    private float _top;
+    private float _right;
+    private float _bottom;
 
 
     public void InitCameraAtLocation(Vector3 playerPos, int mazeX, int mazeY)
@@ -19,12 +19,12 @@ public class CameraManager : Singleton<CameraManager>
         float y = _mainCamera.orthographicSize;
         float x = _mainCamera.aspect * _mainCamera.orthographicSize;
 
-        left = x;
-        top = -y;
-        right = mazeX - x;
-        bottom = -mazeY + y;
+        _left = x;
+        _top = -y;
+        _right = mazeX - x;
+        _bottom = -mazeY + y;
 
-        Debug.Log($"left {left} top {top} right {right} bottom {bottom}");
+        Debug.Log($"left {_left} top {_top} right {_right} bottom {_bottom}");
 
         UpdateCameraPos(playerPos);
     }
@@ -33,8 +33,8 @@ public class CameraManager : Singleton<CameraManager>
     {
         _mainCamera.transform.position = new Vector3
          (
-            Mathf.Clamp(playerPos.x, left, right),
-            Mathf.Clamp(playerPos.y, bottom, top),
+            Mathf.Clamp(playerPos.x, _left, _right),
+            Mathf.Clamp(playerPos.y, _bottom, _top),
             _mainCamera.transform.position.z
         );
     }

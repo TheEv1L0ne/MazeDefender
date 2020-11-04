@@ -20,11 +20,11 @@ public class MazeGraphicsGenerator
 
                 if (maze.mazeMatrix[i,j].Walkable == false)
                 {
-                    tile.GetComponent<SpriteRenderer>().color = Color.red;
+                    tile.GetComponent<SpriteRenderer>().sprite = SpriteManager.Instance.Clif;
                 }
                 else
                 {
-                    tile.GetComponent<SpriteRenderer>().color = Color.green;
+                    tile.GetComponent<SpriteRenderer>().sprite = SpriteManager.Instance.Dirt;
                 }
             }
         }
