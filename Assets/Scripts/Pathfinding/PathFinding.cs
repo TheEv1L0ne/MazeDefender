@@ -25,4 +25,9 @@ public abstract class PathFinding : IPathFinding
     {
 
     }
+
+    public virtual List<MazeNode> GetPath()
+    {
+        return null;
+    }
 }

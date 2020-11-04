@@ -54,10 +54,10 @@ public class GameManager : Singleton<GameManager>
                         {
                             endNode = maze.mazeMatrix[x, y];
 
-                            AStarPathfinding aStar = new AStarPathfinding();
+                            PathFinding aStar = new AStarPathfinding();
                             aStar.InitPathfinder(maze, startNode, endNode);
                             aStar.FindPath();
-                            aStar.GenerateMazeGraphics(MazeManager.Instance.MazeGraphicsHolder);
+                            //aStar.GenerateMazeGraphics(MazeManager.Instance.MazeGraphicsHolder);
 
                             if (ITrave != null)
                             {

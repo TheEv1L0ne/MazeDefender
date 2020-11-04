@@ -6,4 +6,5 @@ public interface IPathFinding
 {
     void FindPath();
     void RetracePath(MazeNode startNode, MazeNode endNode);
+    List<MazeNode> GetPath();
 }

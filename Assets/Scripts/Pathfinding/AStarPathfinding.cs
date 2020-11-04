@@ -76,7 +76,7 @@ public class AStarPathfinding : PathFinding
 		this.path = path;
 	}
 
-	public List<MazeNode> GetPath()
+	public override List<MazeNode> GetPath()
     {
 		return path;
     }
@@ -89,14 +89,5 @@ public class AStarPathfinding : PathFinding
 		if (dstX > dstY)
 			return 14 * dstY + 10 * (dstX - dstY);
 		return 14 * dstX + 10 * (dstY - dstX);
-	}
-
-	public void GenerateMazeGraphics(Transform mazeHolder)
-	{
-		if(path != null)
-        foreach (var mazeNode in path)
-        {
-			mazeHolder.GetChild(mazeNode.NodeX * _maze.MazeSizeY + mazeNode.NodeY).GetComponent<SpriteRenderer>().color = Color.magenta;
-		}
 	}
 }
