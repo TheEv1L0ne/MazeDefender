@@ -13,7 +13,9 @@ public class MazeGraphicsGenerator
                 GameObject tile = TilePoolManager.Instance.GetTileFromPool();
                 tile.transform.parent = mazeHolder;
 
-                tile.transform.position = new Vector3(i, -j, 0f);
+                float offset = 0.5f;
+
+                tile.transform.position = new Vector3(i + offset, -j - offset, 0f);
                 maze.mazeMatrix[i, j].NodePosition = tile.transform.position;
 
                 if (maze.mazeMatrix[i,j].Walkable == false)

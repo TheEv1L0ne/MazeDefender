@@ -34,7 +34,7 @@ public class MazeGenerator
 
         // 0 -> Horizontal
         // 1 -> Vertial
-        //var isHorizontal = Random.Range(0, 2) == 0;
+       //isHorizontal = Random.Range(0, 2) == 0;
 
         int wallIndex = isHorizontal ? GenerateIndex(xMin + 1, xMax - 1) : GenerateIndex(yMin + 1, yMax - 1);
         int passageIndex = isHorizontal ? GenerateIndex(yMin, yMax) : GenerateIndex(xMin, xMax);
