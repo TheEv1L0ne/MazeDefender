@@ -21,11 +21,9 @@ public class GameManager : Singleton<GameManager>
         MazeManager.Instance.GenerateMaze();
         maze = MazeManager.Instance.Maze;
         Vector2 playerPos = SpawnPlayer(maze);
-
         startNode = maze.mazeMatrix[(int)playerPos.x, (int)playerPos.y];
-        
 
-
+        CameraManager.Instance.InitCameraAtLocation(startNode.NodePosition, maze.MazeSizeX, maze.MazeSizeY);
 
         StartCoroutine(GameLoop());
     }
@@ -99,6 +97,7 @@ public class GameManager : Singleton<GameManager>
                 yield return null;
                 step += speed * Time.deltaTime;
                 spawnedPlayer.transform.position = Vector2.MoveTowards(currentPos, destinationPos, step);
+                CameraManager.Instance.UpdateCameraPos(spawnedPlayer.transform.position);
             }
         }
 
