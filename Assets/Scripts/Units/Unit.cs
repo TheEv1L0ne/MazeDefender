@@ -2,12 +2,12 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Unit : MonoBehaviour
+public abstract class Unit : MonoBehaviour
 {
 
-    public static readonly string IDLE = "Idle";
-    public static readonly string ATTACK = "Attack";
-    public static readonly string RUN = "Run";
+    protected static readonly string IDLE = "Idle";
+    protected static readonly string ATTACK = "Attack";
+    protected static readonly string RUN = "Run";
 
     [SerializeField] private Animator _animator;
     public UnitData Data { get; private set; }
@@ -25,7 +25,7 @@ public class Unit : MonoBehaviour
         endNode = null;
     }    
 
-    public void PlayAnim(string animName)
+    private void PlayAnim(string animName)
     {
         _animator.Play(animName);
     }
@@ -54,26 +54,44 @@ public class Unit : MonoBehaviour
 
     private IEnumerator IMoveToDestination(List<MazeNode> path)
     {
+        PlayAnim(RUN);
 
         for (int i = 0; i < path.Count; i++)
         {
             Vector3 destinationPos = path[i].NodePosition;
             Vector3 currentPos = this.transform.position;
 
+            if(destinationPos.x < currentPos.x)
+            {
+                _animator.transform.localScale = new Vector3(-1f, 1f, 1f);
+            }
+           
+            if(destinationPos.x > currentPos.x)
+            {
+                _animator.transform.localScale = new Vector3(1f, 1f, 1f);
+            }
+
             startNode = path[i];
 
             float step = 0;
-            float speed = 5f;
+            float speed = Data.MovementSpeed;
 
             while (this.transform.position != destinationPos)
             {
                 yield return null;
                 step += speed * Time.deltaTime;
-                this.transform.position = Vector2.MoveTowards(currentPos, destinationPos, step);
-                CameraManager.Instance.UpdateCameraPos(this.transform.position);
-            }
+                this.transform.position = Vector2.MoveTowards(currentPos, destinationPos, step);              
+                AdjustCamera();
+            }         
         }
 
+        PlayAnim(IDLE);
+
         endNode = null;
+    }
+
+    public virtual void AdjustCamera()
+    {
+
     }
 }
