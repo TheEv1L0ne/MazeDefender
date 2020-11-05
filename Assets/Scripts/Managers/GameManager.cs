@@ -6,11 +6,13 @@ using UnityEngine.Experimental.UIElements;
 public class GameManager : Singleton<GameManager>
 {
 
-    [SerializeField] private GameObject playerObject;
+    [SerializeField] private GameObject _playerObjectPrefab;
+    [SerializeField] private GameObject _enemyObjectPrefab;
 
-    Maze maze;
+    private Maze _maze;
+    private Unit _playerUnit;
 
-    private Unit playerUnit;
+    private List<Unit> _enemyUnits;
 
     // Start is called before the first frame update
     void Start()
@@ -22,7 +24,7 @@ public class GameManager : Singleton<GameManager>
     private void InitGame()
     {
         MazeManager.Instance.GenerateMaze();     
-        maze = MazeManager.Instance.Maze;
+        _maze = MazeManager.Instance.Maze;
 
         (int, int) emptyTileIndex = MazeManager.Instance.GetEmptyNodeIndex();
 
@@ -34,7 +36,14 @@ public class GameManager : Singleton<GameManager>
             Position = Vector3.zero
         };
 
-        playerUnit = SpawnUnit(playerObject, emptyTileIndex, data);
+        _playerUnit = SpawnUnit(_playerObjectPrefab, emptyTileIndex, data);
+
+        _enemyUnits = new List<Unit>();
+        for (int i = 0; i < 10; i++)
+        {
+            Unit enemy = SpawnUnit(_enemyObjectPrefab, MazeManager.Instance.GetEmptyNodeIndex());
+            _enemyUnits.Add(enemy);
+        }
 
         CameraManager.Instance.InitCameraAtLocation(emptyTileIndex);
 
@@ -62,11 +71,14 @@ public class GameManager : Singleton<GameManager>
                         int y = arrayIndex % MazeManager.Instance.Maze.MazeSizeY;
 
                         MazeNode clickedNode = MazeManager.Instance.GetNode(x, y);
-                        Debug.Log($"Index of tile x = {x}, y = {y}");
 
                         if(clickedNode.Walkable)
                         {
-                            playerUnit.Move(clickedNode);
+                            _playerUnit.Move(clickedNode);
+                            foreach (var item in _enemyUnits)
+                            {
+                                item.Move(clickedNode);
+                            }
                         }
 
                     }
@@ -79,7 +91,19 @@ public class GameManager : Singleton<GameManager>
 
     private Unit SpawnUnit(GameObject fromPrefab, (int, int) atIndex, UnitData withData = null)
     {
-        Vector3 atPosition = maze.mazeMatrix[atIndex.Item1, atIndex.Item2].NodePosition;
+
+        if(withData == null)
+        {
+            withData = new UnitData()
+            {
+                HitPoints = 100,
+                Damage = 10,
+                MovementSpeed = 1,
+                Position = Vector3.zero
+            };
+        }
+
+        Vector3 atPosition = _maze.mazeMatrix[atIndex.Item1, atIndex.Item2].NodePosition;
         GameObject unitObject = Instantiate(fromPrefab, atPosition, Quaternion.identity);
 
         Unit unit = unitObject.GetComponent<Unit>();

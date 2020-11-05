@@ -486,7 +486,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _persistent: 1
-  playerObject: {fileID: 7728614143723320276, guid: bf46afd0035131e40910036444019833,
+  _playerObjectPrefab: {fileID: 7728614143723320276, guid: bf46afd0035131e40910036444019833,
+    type: 3}
+  _enemyObjectPrefab: {fileID: 7219665254302915429, guid: fa3dfc9c1d6575d42b45fc853abd58e6,
     type: 3}
 --- !u!4 &1072855010
 Transform:
