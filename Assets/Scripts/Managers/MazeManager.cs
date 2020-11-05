@@ -25,7 +25,7 @@ public class MazeManager : Singleton<MazeManager>
         mazeGraphics.GenerateMazeGraphics(_maze, _mazeGraphicsHolder);
     }
 
-    private MazeNode GetTile()
+    public (int, int) GetEmptyNodeIndex()
     {
         bool spawnLocGood = false;
 
@@ -34,18 +34,21 @@ public class MazeManager : Singleton<MazeManager>
 
         while (!spawnLocGood)
         {
-            x = Random.Range(0, _maze.mazeMatrix.GetLength(0));
-            y = Random.Range(0, _maze.mazeMatrix.GetLength(1));
+            x = Random.Range(0, _maze.MazeSizeX);
+            y = Random.Range(0, _maze.MazeSizeY);
 
             if (_maze.mazeMatrix[x, y].Walkable)
             {
                 spawnLocGood = true;
-                return _maze.mazeMatrix[x, y];
-
             }
         }
 
-        return null;
+        return (x,y);
+    }
+
+    public MazeNode GetNode(int atX, int atY)
+    {
+        return _maze.mazeMatrix[atX, atY];
     }
 
     public void PlayerGraphics(int x, int y)

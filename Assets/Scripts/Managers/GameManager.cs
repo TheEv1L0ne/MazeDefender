@@ -8,22 +8,35 @@ public class GameManager : Singleton<GameManager>
 
     [SerializeField] private GameObject playerObject;
 
-    MazeNode startNode = null;
-    MazeNode endNode = null;
     Maze maze;
 
-    private GameObject spawnedPlayer;
+    private Unit playerUnit;
 
     // Start is called before the first frame update
     void Start()
     {
-        
-        MazeManager.Instance.GenerateMaze();
-        maze = MazeManager.Instance.Maze;
-        Vector2 playerPos = SpawnPlayer(maze);
-        startNode = maze.mazeMatrix[(int)playerPos.x, (int)playerPos.y];
 
-        CameraManager.Instance.InitCameraAtLocation(startNode.NodePosition, maze.MazeSizeX, maze.MazeSizeY);
+        InitGame();
+    }
+
+    private void InitGame()
+    {
+        MazeManager.Instance.GenerateMaze();     
+        maze = MazeManager.Instance.Maze;
+
+        (int, int) emptyTileIndex = MazeManager.Instance.GetEmptyNodeIndex();
+
+        UnitData data = new UnitData()
+        {
+            HitPoints = 200,
+            Damage = 10,
+            MovementSpeed = 5,
+            Position = Vector3.zero
+        };
+
+        playerUnit = SpawnUnit(playerObject, emptyTileIndex, data);
+
+        CameraManager.Instance.InitCameraAtLocation(emptyTileIndex);
 
         StartCoroutine(GameLoop());
     }
@@ -48,25 +61,12 @@ public class GameManager : Singleton<GameManager>
                         int x = arrayIndex / MazeManager.Instance.Maze.MazeSizeY;
                         int y = arrayIndex % MazeManager.Instance.Maze.MazeSizeY;
 
+                        MazeNode clickedNode = MazeManager.Instance.GetNode(x, y);
                         Debug.Log($"Index of tile x = {x}, y = {y}");
 
-                        if (endNode == null || (endNode != maze.mazeMatrix[x, y]))
+                        if(clickedNode.Walkable)
                         {
-                            endNode = maze.mazeMatrix[x, y];
-
-                            PathFinding aStar = new AStarPathfinding();
-                            aStar.InitPathfinder(maze, startNode, endNode);
-                            aStar.FindPath();
-                            //aStar.GenerateMazeGraphics(MazeManager.Instance.MazeGraphicsHolder);
-
-                            if (ITrave != null)
-                            {
-                                StopCoroutine(ITrave);
-                                ITrave = null;
-                            }
-
-                            ITrave = ITravelToDestination(aStar.GetPath());
-                            StartCoroutine(ITrave);
+                            playerUnit.Move(clickedNode);
                         }
 
                     }
@@ -77,57 +77,14 @@ public class GameManager : Singleton<GameManager>
         }
     }
 
-    IEnumerator ITrave = null;
-
-    private IEnumerator ITravelToDestination(List<MazeNode> path)
-   {
-
-        for (int i = 0; i < path.Count; i++)
-        {
-            Vector3 destinationPos = path[i].NodePosition;
-            Vector3 currentPos = spawnedPlayer.transform.position;
-
-            startNode = path[i];
-
-            float step = 0;
-            float speed = 5f;
-
-            while (spawnedPlayer.transform.position != destinationPos)
-            {
-                yield return null;
-                step += speed * Time.deltaTime;
-                spawnedPlayer.transform.position = Vector2.MoveTowards(currentPos, destinationPos, step);
-                CameraManager.Instance.UpdateCameraPos(spawnedPlayer.transform.position);
-            }
-        }
-
-        endNode = null;
-    }
-
-    private Vector2 SpawnPlayer(Maze maze)
+    private Unit SpawnUnit(GameObject fromPrefab, (int, int) atIndex, UnitData withData = null)
     {
-        bool spawnLocGood = false;
+        Vector3 atPosition = maze.mazeMatrix[atIndex.Item1, atIndex.Item2].NodePosition;
+        GameObject unitObject = Instantiate(fromPrefab, atPosition, Quaternion.identity);
 
-        int x = -1;
-        int y = -1;
+        Unit unit = unitObject.GetComponent<Unit>();
+        unit.Init(atIndex, withData);
 
-        while (!spawnLocGood)
-        {
-            x = Random.Range(0, maze.mazeMatrix.GetLength(0));
-            y = Random.Range(0, maze.mazeMatrix.GetLength(1));
-
-            if (maze.mazeMatrix[x,y].Walkable)
-            {
-                spawnLocGood = true;
-            }
-        }
-
-        Vector3 position = maze.mazeMatrix[x, y].NodePosition;
-        spawnedPlayer = Instantiate(playerObject, position, Quaternion.identity);
-
-        //MazeManager.Instance.PlayerGraphics(x, y);
-
-        return new Vector2(x, y);
-
+        return unitObject.GetComponent<Unit>();
     }
 }

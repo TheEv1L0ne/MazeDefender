@@ -14,10 +14,15 @@ public class CameraManager : Singleton<CameraManager>
     private float _bottom;
 
 
-    public void InitCameraAtLocation(Vector3 playerPos, int mazeX, int mazeY)
+    public void InitCameraAtLocation((int, int) atIndex)
     {
         float y = _mainCamera.orthographicSize;
         float x = _mainCamera.aspect * _mainCamera.orthographicSize;
+
+        float mazeX = MazeManager.Instance.Maze.MazeSizeX;
+        float mazeY = MazeManager.Instance.Maze.MazeSizeY;
+
+        Vector3 pos = MazeManager.Instance.Maze.mazeMatrix[atIndex.Item1, atIndex.Item2].NodePosition;
 
         _left = x;
         _top = -y;
@@ -26,7 +31,7 @@ public class CameraManager : Singleton<CameraManager>
 
         Debug.Log($"left {_left} top {_top} right {_right} bottom {_bottom}");
 
-        UpdateCameraPos(playerPos);
+        UpdateCameraPos(pos);
     }
 
     public void UpdateCameraPos(Vector3 playerPos)
