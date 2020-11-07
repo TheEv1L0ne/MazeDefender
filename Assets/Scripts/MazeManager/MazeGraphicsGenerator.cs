@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -18,11 +19,12 @@ public class MazeGraphicsGenerator
                 tile.transform.position = new Vector3(i + offset, -j - offset, 0f);
                 maze.mazeMatrix[i, j].NodePosition = tile.transform.position;
 
-                if (maze.mazeMatrix[i,j].Walkable == false)
+                if (maze.mazeMatrix[i,j].Type == MazeNode.TileType.Wall)
                 {
                     tile.GetComponent<SpriteRenderer>().sprite = SpriteManager.Instance.Clif;
                 }
-                else
+
+                if (maze.mazeMatrix[i, j].Type == MazeNode.TileType.Ground)
                 {
                     tile.GetComponent<SpriteRenderer>().sprite = SpriteManager.Instance.Dirt;
                 }

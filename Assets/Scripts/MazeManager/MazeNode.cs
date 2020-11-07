@@ -12,11 +12,20 @@ public class MazeNode
     public int GCost { get; set; }
     public int HCost { get; set; }
     public int FCost { get => GCost + HCost; }
+    public TileType Type { get; set; }
 
-    public MazeNode(bool walkable, int x, int y)
+    public MazeNode(int x, int y)
     {
-        Walkable = walkable;
+        Type = TileType.Ground;
         NodeX = x;
         NodeY = y;
+    }
+
+    public enum TileType
+    {
+        City,
+        Wall,
+        Ground,
+        Passage
     }
 }

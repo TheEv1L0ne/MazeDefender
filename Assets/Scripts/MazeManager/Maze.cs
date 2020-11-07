@@ -18,7 +18,7 @@ public class Maze
 		{
 			for (int j = 0; j < MazeSizeY; j++)
 			{
-				mazeMatrix[i, j] = new MazeNode(true, i, j);
+				mazeMatrix[i, j] = new MazeNode(i, j);
 			}
 		}
 	}

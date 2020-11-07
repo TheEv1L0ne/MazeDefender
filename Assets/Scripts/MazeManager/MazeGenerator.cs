@@ -69,9 +69,9 @@ public class MazeGenerator
                 continue;
 
             if (isHorizontal)
-                maze[wallindex, i].Walkable = false;
+                maze[wallindex, i].Type = MazeNode.TileType.Wall;
             else
-                maze[i, wallindex].Walkable = false;
+                maze[i, wallindex].Type = MazeNode.TileType.Wall;
         }
 
         return mazeT;
@@ -86,7 +86,7 @@ public class MazeGenerator
         {
             for (int j = 0; j < _maze.MazeSizeY; j++)
             {
-                output += $"{(maze[i, j].Walkable ? ("<color=red>" + maze[i, j] + "</color>") : (maze[i, j]).ToString())} ";
+                output += $"{(maze[i, j].Type == MazeNode.TileType.Ground ? ("<color=red>" + maze[i, j] + "</color>") : (maze[i, j]).ToString())} ";
             }
 
             output += "\n";

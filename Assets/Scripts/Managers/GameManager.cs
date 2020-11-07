@@ -8,16 +8,45 @@ public class GameManager : Singleton<GameManager>
 
     [SerializeField] private GameObject _playerObjectPrefab;
     [SerializeField] private GameObject _enemyObjectPrefab;
+    [SerializeField] private GameObject _cityObject;
+
+    [SerializeField] private GameObject _projectile;
 
     private Maze _maze;
     private Unit _playerUnit;
 
     private List<Unit> _enemyUnits;
 
+    MazeNode _cityNode = null;
+    public Vector3 CityPos => _cityNode.NodePosition;
+    public Vector3 PlayerPos => _playerUnit.transform.position;
+    public MazeNode CityNode => _cityNode;
+
+    float time = 10 * 60;
+
+    int cityHp = 200;
+
+    public GameObject Projectile { get => _projectile;}
+
     // Start is called before the first frame update
     void Start()
     {
 
+        
+    }
+
+    private void OnEnable()
+    {
+        UIManager.onStartPressedkDelegate += OnStart;
+    }
+
+    private void OnDisable()
+    {
+        UIManager.onStartPressedkDelegate -= OnStart;
+    }
+
+    private void OnStart()
+    {
         InitGame();
     }
 
@@ -33,13 +62,14 @@ public class GameManager : Singleton<GameManager>
             HitPoints = 200,
             Damage = 10,
             MovementSpeed = 5,
-            Position = Vector3.zero
         };
+
+        SpawnBase(MazeManager.Instance.GetEmptyNodeIndex());
 
         _playerUnit = SpawnUnit(_playerObjectPrefab, emptyTileIndex, data);
 
         _enemyUnits = new List<Unit>();
-        for (int i = 0; i < 10; i++)
+        for (int i = 0; i < 1; i++)
         {
             Unit enemy = SpawnUnit(_enemyObjectPrefab, MazeManager.Instance.GetEmptyNodeIndex());
             _enemyUnits.Add(enemy);
@@ -54,8 +84,12 @@ public class GameManager : Singleton<GameManager>
     {
         while(true)
         {
+            foreach (var item in _enemyUnits)
+            {
+                item.ExecuteUnitState();
+            }
 
-            if(Input.GetMouseButtonDown(0))
+            if (Input.GetMouseButtonDown(0))
             {
 
                 Vector3 mousePos = Input.mousePosition;
@@ -72,17 +106,15 @@ public class GameManager : Singleton<GameManager>
 
                         MazeNode clickedNode = MazeManager.Instance.GetNode(x, y);
 
-                        if(clickedNode.Walkable)
+                        if(clickedNode.Type == MazeNode.TileType.Ground
+                            || clickedNode.Type == MazeNode.TileType.City)
                         {
                             _playerUnit.Move(clickedNode);
-                            foreach (var item in _enemyUnits)
-                            {
-                                item.Move(clickedNode);
-                            }
                         }
 
                     }
                 }
+
             }
 
             yield return null;
@@ -98,8 +130,7 @@ public class GameManager : Singleton<GameManager>
             {
                 HitPoints = 100,
                 Damage = 10,
-                MovementSpeed = 1,
-                Position = Vector3.zero
+                MovementSpeed = 2,
             };
         }
 
@@ -110,5 +141,32 @@ public class GameManager : Singleton<GameManager>
         unit.Init(atIndex, withData);
 
         return unitObject.GetComponent<Unit>();
+    }
+
+    private void SpawnBase((int, int) atIndex)
+    {
+        Debug.Log($"SPAWNING AT LOCATION {atIndex.Item1} {atIndex.Item2}");
+
+        MazeManager.Instance.InitBase(atIndex);
+
+        _cityNode = _maze.mazeMatrix[atIndex.Item1, atIndex.Item2];
+        Vector3 atPosition = _cityNode.NodePosition;
+        GameObject unitObject = Instantiate(_cityObject, atPosition, Quaternion.identity);
+    }
+
+    public void SpawnProjectile(Vector3 atLocation)
+    {
+        Debug.Log($"atLocation --->> {atLocation}");
+
+        GameObject projectile = Instantiate(_projectile);
+        projectile.transform.position = atLocation;
+        Projectile p= projectile.GetComponent<Projectile>();
+        p.Fly(_cityNode.NodePosition);
+
+    }
+
+    public void TimerCountDown(float timeInSeconds)
+    {
+        float iniTime = timeInSeconds;
     }
 }

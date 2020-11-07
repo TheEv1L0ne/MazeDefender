@@ -6,7 +6,10 @@ public class CameraManager : Singleton<CameraManager>
 {
     [SerializeField] private Camera _mainCamera;
 
+    [SerializeField] private Camera _uiCamera;
+
     public Camera MainCamera { get => _mainCamera;}
+    public Camera UiCamera { get => _uiCamera;}
 
     private float _left;
     private float _top;

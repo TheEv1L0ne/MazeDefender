@@ -12,6 +12,10 @@ public abstract class Unit : MonoBehaviour
     [SerializeField] private Animator _animator;
     public UnitData Data { get; private set; }
 
+    public bool isMoving = false;
+    public bool isAttacking = false;
+    public float attackCooldown = 3f;
+    float attackTimer;
 
     MazeNode startNode = null;
     MazeNode endNode = null;
@@ -30,10 +34,58 @@ public abstract class Unit : MonoBehaviour
         _animator.Play(animName);
     }
 
+    public void ExecuteUnitState()
+    {
+
+        if (!CheckIfInRange(GameManager.Instance.CityPos)
+            && !CheckIfInRange(GameManager.Instance.PlayerPos))
+        {
+
+            attackTimer = attackCooldown;
+            isAttacking = false;
+
+            if (!isMoving)
+            {
+                isMoving = true;
+                Move(GameManager.Instance.CityNode);
+            }
+        }
+        else
+        {
+            isMoving = false;
+
+            if (!isAttacking)
+            {
+                isAttacking = true;
+                Stop();
+            }
+            else if(attackTimer == attackCooldown)
+            {
+                Attack();
+                attackTimer -= Time.deltaTime;
+            }
+            else if(attackTimer > 0)
+            {
+                attackTimer -= Time.deltaTime;
+            }
+            else
+            {
+                attackTimer = attackCooldown;
+            }
+        }
+    }
+
+    private void Attack()
+    {
+        PlayAnim(ATTACK);
+
+        GameManager.Instance.SpawnProjectile(transform.position);
+    }
+
     public void Move(MazeNode toNode)
     {
         if (endNode == null || (endNode != toNode))
-        {
+        {     
             endNode = toNode;
 
             PathFinding aStar = new AStarPathfinding();
@@ -54,7 +106,8 @@ public abstract class Unit : MonoBehaviour
 
     private IEnumerator IMoveToDestination(List<MazeNode> path)
     {
-        PlayAnim(RUN);
+        if(path.Count > 0)
+            PlayAnim(RUN);
 
         for (int i = 0; i < path.Count; i++)
         {
@@ -88,6 +141,43 @@ public abstract class Unit : MonoBehaviour
         PlayAnim(IDLE);
 
         endNode = null;
+    }
+
+    public void Stop()
+    {
+        endNode = null;
+
+        if (IMove != null)
+            StopCoroutine(IMove);
+        IMove = null;
+        PlayAnim(IDLE);
+    }
+
+    public bool CheckIfInRange(Vector3 targetPos)
+    {
+        var heading = targetPos - transform.position;
+        var distance = heading.magnitude;
+        var direction = heading / distance;
+
+        bool noWallsBetween = distance <= 5;
+
+        if (noWallsBetween)
+        {
+            RaycastHit2D[] hit1 = Physics2D.RaycastAll(transform.position, direction, distance);
+            {
+                foreach (var item in hit1)
+                {
+                    int arrayIndex = item.transform.GetSiblingIndex();
+                    int x = arrayIndex / MazeManager.Instance.Maze.MazeSizeY;
+                    int y = arrayIndex % MazeManager.Instance.Maze.MazeSizeY;
+
+                    if (MazeManager.Instance.Maze.mazeMatrix[x, y].Type == MazeNode.TileType.Wall)
+                        noWallsBetween = false;
+                }
+            }
+        }
+
+        return noWallsBetween;
     }
 
     public virtual void AdjustCamera()

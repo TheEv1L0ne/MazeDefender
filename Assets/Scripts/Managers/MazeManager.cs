@@ -25,6 +25,13 @@ public class MazeManager : Singleton<MazeManager>
         mazeGraphics.GenerateMazeGraphics(_maze, _mazeGraphicsHolder);
     }
 
+    public void InitBase((int,int) atIndex)
+    {
+        _mazeGraphicsHolder.GetChild(atIndex.Item1 * _maze.MazeSizeY + atIndex.Item2).GetComponent<SpriteRenderer>().sprite = SpriteManager.Instance.Base;
+        _maze.mazeMatrix[atIndex.Item1, atIndex.Item2].Type = MazeNode.TileType.City;
+
+    }
+
     public (int, int) GetEmptyNodeIndex()
     {
         bool spawnLocGood = false;
@@ -37,7 +44,7 @@ public class MazeManager : Singleton<MazeManager>
             x = Random.Range(0, _maze.MazeSizeX);
             y = Random.Range(0, _maze.MazeSizeY);
 
-            if (_maze.mazeMatrix[x, y].Walkable)
+            if (_maze.mazeMatrix[x, y].Type == MazeNode.TileType.Ground)
             {
                 spawnLocGood = true;
             }
@@ -58,4 +65,5 @@ public class MazeManager : Singleton<MazeManager>
         Transform gameObject = _mazeGraphicsHolder.GetChild(x * _maze.mazeMatrix.GetLength(1) + y);
         gameObject.GetComponent<SpriteRenderer>().color = Color.blue;
     }
+
 }

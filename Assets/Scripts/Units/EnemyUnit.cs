@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class EnemyUnit : Unit
-{ 
-
+{
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        Debug.Log("ENEMY HIT T");
+    }
 }
