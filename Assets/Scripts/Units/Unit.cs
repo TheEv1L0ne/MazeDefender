@@ -11,75 +11,36 @@ public abstract class Unit : MonoBehaviour
 
     [SerializeField] private Animator _animator;
     public UnitData Data { get; private set; }
+   
+    protected bool isMoving = false;
+    protected bool isAttacking = false;
+    protected float attackTimer;
 
-    public bool isMoving = false;
-    public bool isAttacking = false;
-    public float attackCooldown = 3f;
-    float attackTimer;
+    protected MazeNode startNode = null;
+    protected MazeNode endNode = null;
 
-    MazeNode startNode = null;
-    MazeNode endNode = null;
-
-    IEnumerator IMove = null;
+    protected IEnumerator IMove = null;
 
     public void Init((int, int) atIndex, UnitData data)
     {
         Data = data;
         startNode = MazeManager.Instance.Maze.mazeMatrix[atIndex.Item1, atIndex.Item2];
         endNode = null;
-    }    
+    }
 
-    private void PlayAnim(string animName)
+    public virtual void ExecuteUnitState()
+    {
+
+    }
+
+    protected void PlayAnim(string animName)
     {
         _animator.Play(animName);
     }
 
-    public void ExecuteUnitState()
+    protected virtual void Attack()
     {
 
-        if (!CheckIfInRange(GameManager.Instance.CityPos)
-            && !CheckIfInRange(GameManager.Instance.PlayerPos))
-        {
-
-            attackTimer = attackCooldown;
-            isAttacking = false;
-
-            if (!isMoving)
-            {
-                isMoving = true;
-                Move(GameManager.Instance.CityNode);
-            }
-        }
-        else
-        {
-            isMoving = false;
-
-            if (!isAttacking)
-            {
-                isAttacking = true;
-                Stop();
-            }
-            else if(attackTimer == attackCooldown)
-            {
-                Attack();
-                attackTimer -= Time.deltaTime;
-            }
-            else if(attackTimer > 0)
-            {
-                attackTimer -= Time.deltaTime;
-            }
-            else
-            {
-                attackTimer = attackCooldown;
-            }
-        }
-    }
-
-    private void Attack()
-    {
-        PlayAnim(ATTACK);
-
-        GameManager.Instance.SpawnProjectile(transform.position);
     }
 
     public void Move(MazeNode toNode)
@@ -140,44 +101,8 @@ public abstract class Unit : MonoBehaviour
 
         PlayAnim(IDLE);
 
+        isMoving = false;
         endNode = null;
-    }
-
-    public void Stop()
-    {
-        endNode = null;
-
-        if (IMove != null)
-            StopCoroutine(IMove);
-        IMove = null;
-        PlayAnim(IDLE);
-    }
-
-    public bool CheckIfInRange(Vector3 targetPos)
-    {
-        var heading = targetPos - transform.position;
-        var distance = heading.magnitude;
-        var direction = heading / distance;
-
-        bool noWallsBetween = distance <= 5;
-
-        if (noWallsBetween)
-        {
-            RaycastHit2D[] hit1 = Physics2D.RaycastAll(transform.position, direction, distance);
-            {
-                foreach (var item in hit1)
-                {
-                    int arrayIndex = item.transform.GetSiblingIndex();
-                    int x = arrayIndex / MazeManager.Instance.Maze.MazeSizeY;
-                    int y = arrayIndex % MazeManager.Instance.Maze.MazeSizeY;
-
-                    if (MazeManager.Instance.Maze.mazeMatrix[x, y].Type == MazeNode.TileType.Wall)
-                        noWallsBetween = false;
-                }
-            }
-        }
-
-        return noWallsBetween;
     }
 
     public virtual void AdjustCamera()

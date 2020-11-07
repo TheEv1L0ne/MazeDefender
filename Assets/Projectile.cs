@@ -4,36 +4,83 @@ using UnityEngine;
 
 public class Projectile : MonoBehaviour
 {
-    public void Fly(Vector3 target)
+    private float _distance;
+    private float _speed;
+    private ProjectileTargetType _targetType;
+    private Vector3 _targetPos;
+    private int _damage;
+
+    public void Init(float withDistance, float withSpeed, int withDamage, ProjectileTargetType withTargetType, Vector3 targetPos)
     {
-        StartCoroutine(IFly(target));
+        _distance = withDistance;
+        _targetType = withTargetType;
+        _speed = withSpeed;
+        _targetPos = targetPos;
+        _damage = withDamage;
     }
 
-    public IEnumerator IFly(Vector3 target)
+    public void Fly()
     {
-        float step = 0;
-        float speed = 0.5f;
+        Debug.Log(_targetType);
 
-        Debug.Log($"target {target}");
+        StartCoroutine(IFly());
+    }
+
+    public IEnumerator IFly()
+    {
+        var heading = _targetPos - transform.position;
+        var distance = heading.magnitude;
+        var direction = heading / distance;
+
+        var endLocation = transform.position + (direction * _distance);
+
+        float step = 0;
+        float speed = _speed;
 
         Vector3 currentPos = transform.position;
         if (this != null)
-            while (transform.position != target)
-        {
-            yield return null;
-            step += speed * Time.deltaTime;
-            
-                transform.position = Vector2.MoveTowards(currentPos, target, step);
-        }
+            while (transform.position != endLocation)
+            {
+                yield return null;
+                step += speed * Time.deltaTime;
+
+                transform.position = Vector2.MoveTowards(currentPos, endLocation, step);
+            }
+
+        Destroy(this.gameObject);
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        if (collision.tag == "City")
+
+        if (collision.tag == "City" && _targetType == ProjectileTargetType.City)
         {
-            Debug.Log("PRPJECTILE HIT");
             StopAllCoroutines();
+
+            GameManager.Instance.PlayerBase.TakeDamage(_damage);
+
+            Destroy(this.gameObject);
+        }
+
+        if(collision.tag == "Player" && _targetType == ProjectileTargetType.Player)
+        {
+            StopAllCoroutines();
+
+            Destroy(this.gameObject);
+        }
+
+        if (collision.tag == "Enemy" && _targetType == ProjectileTargetType.Enemy)
+        {
+            StopAllCoroutines();
+
             Destroy(this.gameObject);
         }
     }
+}
+
+public enum ProjectileTargetType
+{
+    City,
+    Player,
+    Enemy
 }

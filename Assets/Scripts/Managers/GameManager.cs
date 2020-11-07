@@ -1,6 +1,8 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.Experimental.UIElements;
 
 public class GameManager : Singleton<GameManager>
@@ -11,29 +13,22 @@ public class GameManager : Singleton<GameManager>
     [SerializeField] private GameObject _cityObject;
 
     [SerializeField] private GameObject _projectile;
+    public GameObject Projectile { get => _projectile; }
 
     private Maze _maze;
     private Unit _playerUnit;
+    public Unit PlayerUnit => _playerUnit;
 
     private List<Unit> _enemyUnits;
+    public List<Unit> EnemyUnits => _enemyUnits;
+
+    private PlayerBase _playerBase;
+    public PlayerBase PlayerBase => _playerBase;
 
     MazeNode _cityNode = null;
     public Vector3 CityPos => _cityNode.NodePosition;
     public Vector3 PlayerPos => _playerUnit.transform.position;
     public MazeNode CityNode => _cityNode;
-
-    float time = 10 * 60;
-
-    int cityHp = 200;
-
-    public GameObject Projectile { get => _projectile;}
-
-    // Start is called before the first frame update
-    void Start()
-    {
-
-        
-    }
 
     private void OnEnable()
     {
@@ -55,16 +50,19 @@ public class GameManager : Singleton<GameManager>
         MazeManager.Instance.GenerateMaze();     
         _maze = MazeManager.Instance.Maze;
 
+        SpawnBase(MazeManager.Instance.GetEmptyNodeIndex());
+
         (int, int) emptyTileIndex = MazeManager.Instance.GetEmptyNodeIndex();
 
         UnitData data = new UnitData()
         {
             HitPoints = 200,
-            Damage = 10,
+            AttackDamage = 10,
             MovementSpeed = 5,
+            AttackCooldown = 2,
+            AttackDistance = 4,
+            AttackRange = 4
         };
-
-        SpawnBase(MazeManager.Instance.GetEmptyNodeIndex());
 
         _playerUnit = SpawnUnit(_playerObjectPrefab, emptyTileIndex, data);
 
@@ -84,12 +82,17 @@ public class GameManager : Singleton<GameManager>
     {
         while(true)
         {
+            if (!PlayerBase.IsAlive)
+            {
+                FinishGame();
+            }
+
             foreach (var item in _enemyUnits)
             {
                 item.ExecuteUnitState();
             }
 
-            if (Input.GetMouseButtonDown(0))
+            if (Input.GetMouseButtonDown(0) && !EventSystem.current.IsPointerOverGameObject())
             {
 
                 Vector3 mousePos = Input.mousePosition;
@@ -117,8 +120,15 @@ public class GameManager : Singleton<GameManager>
 
             }
 
+            _playerUnit.ExecuteUnitState();
+
             yield return null;
         }
+    }
+
+    private void FinishGame()
+    {
+        throw new NotImplementedException();
     }
 
     private Unit SpawnUnit(GameObject fromPrefab, (int, int) atIndex, UnitData withData = null)
@@ -129,8 +139,11 @@ public class GameManager : Singleton<GameManager>
             withData = new UnitData()
             {
                 HitPoints = 100,
-                Damage = 10,
+                AttackDamage = 10,
                 MovementSpeed = 2,
+                AttackCooldown = 3,
+                AttackDistance = 4,
+                AttackRange = 3,
             };
         }
 
@@ -145,28 +158,11 @@ public class GameManager : Singleton<GameManager>
 
     private void SpawnBase((int, int) atIndex)
     {
-        Debug.Log($"SPAWNING AT LOCATION {atIndex.Item1} {atIndex.Item2}");
-
-        MazeManager.Instance.InitBase(atIndex);
-
         _cityNode = _maze.mazeMatrix[atIndex.Item1, atIndex.Item2];
         Vector3 atPosition = _cityNode.NodePosition;
-        GameObject unitObject = Instantiate(_cityObject, atPosition, Quaternion.identity);
-    }
 
-    public void SpawnProjectile(Vector3 atLocation)
-    {
-        Debug.Log($"atLocation --->> {atLocation}");
-
-        GameObject projectile = Instantiate(_projectile);
-        projectile.transform.position = atLocation;
-        Projectile p= projectile.GetComponent<Projectile>();
-        p.Fly(_cityNode.NodePosition);
-
-    }
-
-    public void TimerCountDown(float timeInSeconds)
-    {
-        float iniTime = timeInSeconds;
+        GameObject baseObject = Instantiate(_cityObject, atPosition, Quaternion.identity);
+        _playerBase = baseObject.GetComponent<PlayerBase>();
+        _playerBase.Init(200, atIndex);
     }
 }
