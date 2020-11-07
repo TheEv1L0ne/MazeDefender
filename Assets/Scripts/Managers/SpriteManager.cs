@@ -6,4 +6,6 @@ public class SpriteManager : Singleton<SpriteManager>
 {
     public Sprite Clif;
     public Sprite Dirt;
+
+    public Sprite Base;
 }
