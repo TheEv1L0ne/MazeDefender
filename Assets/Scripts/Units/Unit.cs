@@ -52,16 +52,21 @@ public abstract class Unit : MonoBehaviour
         {           
             endNode = toNode;
 
-            PathFinding aStar = new AStarPathfinding();
-            aStar.InitPathfinder(MazeManager.Instance.Maze, startNode, endNode);
-            aStar.FindPath();
+            PathFinding pathFinder;
 
+            int randomAlgorithm = Random.Range(0, 2);
 
-            PathFinding bfs = new BreadthFirstSearch();
-            if (this is PlayerUnit)
+            if (randomAlgorithm == 0)
             {
-                bfs.InitPathfinder(MazeManager.Instance.Maze, startNode, endNode);
-                bfs.FindPath();
+                pathFinder = new AStarPathfinding();
+                pathFinder.InitPathfinder(MazeManager.Instance.Maze, startNode, endNode);
+                pathFinder.FindPath();
+            }
+            else
+            {
+                pathFinder = new BreadthFirstSearch();
+                pathFinder.InitPathfinder(MazeManager.Instance.Maze, startNode, endNode);
+                pathFinder.FindPath();
             }
 
             if (IMove != null)
@@ -70,13 +75,7 @@ public abstract class Unit : MonoBehaviour
                 IMove = null;
             }
 
-            if (this is PlayerUnit)
-            {
-                Debug.Log("MOVING PLAYER USING BFS");
-                IMove = IMoveToDestination(bfs.GetPath());
-            }
-            else
-                IMove = IMoveToDestination(aStar.GetPath());
+            IMove = IMoveToDestination(pathFinder.GetPath());
             StartCoroutine(IMove);
         }
     }
