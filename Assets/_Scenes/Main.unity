@@ -910,6 +910,7 @@ MonoBehaviour:
   _persistent: 1
   Clif: {fileID: 21300000, guid: c0f2d4f9a67dbb343b1b8509948bcda4, type: 3}
   Dirt: {fileID: 21300000, guid: 1d74ffe95df41814384255ae9850a073, type: 3}
+  Passage: {fileID: 21300000, guid: 945274af312f2e34aa073bdf9dbf05e4, type: 3}
   Base: {fileID: 21300000, guid: 3c12d82ed0fb0ef4b8c32265ab50904e, type: 3}
 --- !u!4 &499184118
 Transform:

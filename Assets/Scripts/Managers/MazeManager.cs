@@ -21,6 +21,8 @@ public class MazeManager : Singleton<MazeManager>
         _maze.InitMaze(50, 40);
         _maze.GenerateRandomMaze();
 
+        _maze.GeneratePassages();
+
         MazeGraphicsGenerator mazeGraphics = new MazeGraphicsGenerator();
         mazeGraphics.GenerateMazeGraphics(_maze, _mazeGraphicsHolder);
     }

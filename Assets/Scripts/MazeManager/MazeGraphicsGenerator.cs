@@ -29,6 +29,11 @@ public class MazeGraphicsGenerator
                 {
                     tile.GetComponent<SpriteRenderer>().sprite = SpriteManager.Instance.Dirt;
                 }
+
+                if(maze.mazeMatrix[i, j].Type == MazeNode.TileType.Passage)
+                {
+                    tile.GetComponent<SpriteRenderer>().sprite = SpriteManager.Instance.Passage;
+                }
             }
         }
     }

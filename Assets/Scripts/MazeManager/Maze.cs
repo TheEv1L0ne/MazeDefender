@@ -52,4 +52,22 @@ public class Maze
 		MazeGenerator generator = new MazeGenerator();
 		mazeMatrix = generator.GenerateMaze(this, 5);
 	}
+
+	public void GeneratePassages()
+	{
+		int passageNumber = Random.Range(1, 11);
+
+		while(passageNumber > 0)
+        {
+			int x = Random.Range(0, MazeSizeX);
+			int y = Random.Range(0, MazeSizeY);
+
+			if(mazeMatrix[x, y].Type == MazeNode.TileType.Wall)
+            {
+				mazeMatrix[x, y].Type = MazeNode.TileType.Passage;
+				passageNumber--;
+			}
+        }
+
+	}
 }
