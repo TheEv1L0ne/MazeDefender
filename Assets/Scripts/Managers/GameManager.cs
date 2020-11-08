@@ -15,6 +15,9 @@ public class GameManager : Singleton<GameManager>
     [SerializeField] private GameObject _projectile;
     public GameObject Projectile { get => _projectile; }
 
+    [SerializeField] private GameObject _projectilePlayer;
+    public GameObject ProjectilePlayer { get => _projectilePlayer; }
+
     private Maze _maze;
     private Unit _playerUnit;
     public Unit PlayerUnit => _playerUnit;
@@ -30,14 +33,33 @@ public class GameManager : Singleton<GameManager>
     public Vector3 PlayerPos => _playerUnit.transform.position;
     public MazeNode CityNode => _cityNode;
 
+    private List<Unit> _deadUnits = new List<Unit>();
+
     private void OnEnable()
     {
-        UIManager.onStartPressedkDelegate += OnStart;
+        UIManager.onStartPressedDelegate += OnStart;
+        UIManager.onQuitPressedDelegate += OnQuit;
     }
 
     private void OnDisable()
     {
-        UIManager.onStartPressedkDelegate -= OnStart;
+        UIManager.onStartPressedDelegate -= OnStart;
+        UIManager.onQuitPressedDelegate -= OnQuit;
+    }
+
+    private void OnQuit()
+    {
+        StopAllCoroutines();
+
+        for (int i = _enemyUnits.Count - 1; i >= 0; i--)
+        {
+            Destroy(_enemyUnits[i].gameObject);
+        }
+
+        Destroy(_playerUnit.gameObject);
+        Destroy(_playerBase.gameObject);
+
+        TilePoolManager.Instance.ReturnAllTilesToPool();
     }
 
     private void OnStart()
@@ -50,6 +72,8 @@ public class GameManager : Singleton<GameManager>
         MazeManager.Instance.GenerateMaze();     
         _maze = MazeManager.Instance.Maze;
 
+        _deadUnits = new List<Unit>();
+
         SpawnBase(MazeManager.Instance.GetEmptyNodeIndex());
 
         (int, int) emptyTileIndex = MazeManager.Instance.GetEmptyNodeIndex();
@@ -59,7 +83,7 @@ public class GameManager : Singleton<GameManager>
             HitPoints = 200,
             AttackDamage = 10,
             MovementSpeed = 5,
-            AttackCooldown = 2,
+            AttackCooldown = .3f,
             AttackDistance = 4,
             AttackRange = 4
         };
@@ -67,9 +91,19 @@ public class GameManager : Singleton<GameManager>
         _playerUnit = SpawnUnit(_playerObjectPrefab, emptyTileIndex, data);
 
         _enemyUnits = new List<Unit>();
-        for (int i = 0; i < 1; i++)
+        for (int i = 0; i < 5; i++)
         {
-            Unit enemy = SpawnUnit(_enemyObjectPrefab, MazeManager.Instance.GetEmptyNodeIndex());
+            UnitData withData = new UnitData()
+            {
+                HitPoints = 100,
+                AttackDamage = 10,
+                MovementSpeed = 2,
+                AttackCooldown = 3,
+                AttackDistance = 4,
+                AttackRange = 3,
+            };
+
+            Unit enemy = SpawnUnit(_enemyObjectPrefab, MazeManager.Instance.GetEmptyNodeIndex(), withData);
             _enemyUnits.Add(enemy);
         }
 
@@ -89,7 +123,13 @@ public class GameManager : Singleton<GameManager>
 
             foreach (var item in _enemyUnits)
             {
-                item.ExecuteUnitState();
+
+                if (item.IsAlive)
+                    item.ExecuteUnitState();
+                else
+                {
+                    _deadUnits.Add(item);
+                }
             }
 
             if (Input.GetMouseButtonDown(0) && !EventSystem.current.IsPointerOverGameObject())
@@ -114,14 +154,20 @@ public class GameManager : Singleton<GameManager>
                         {
                             _playerUnit.Move(clickedNode);
                         }
-
                     }
                 }
-
             }
 
             _playerUnit.ExecuteUnitState();
 
+            foreach (var item in _deadUnits)
+            {        
+                if(item != null)
+                    Destroy(item.gameObject);
+
+                _enemyUnits.Remove(item);
+            }
+            
             yield return null;
         }
     }

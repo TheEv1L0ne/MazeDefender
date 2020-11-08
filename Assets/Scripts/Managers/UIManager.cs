@@ -8,9 +8,13 @@ public class UIManager : Singleton<UIManager>
 {
     #region Buttons
     [Header ("BUTTONS")]
+    [Header("main menu")]
     [SerializeField] private Button _startButton;
     [SerializeField] private Button _exitButton;
     [SerializeField] private Button _settingsButton;
+
+    [Header("gameplay")]
+    [SerializeField] private Button _quitButton;
     #endregion
 
     #region Screens
@@ -21,13 +25,25 @@ public class UIManager : Singleton<UIManager>
     #endregion
 
     public delegate void OnStartPressed();
-    public static OnStartPressed onStartPressedkDelegate;
+    public static OnStartPressed onStartPressedDelegate;
+
+    public delegate void OnQuitPressed();
+    public static OnQuitPressed onQuitPressedDelegate;
 
     private void Awake()
     {
         _startButton.onClick.AddListener(() => StartGame());
         _exitButton.onClick.AddListener(() => ExitGame());
         _settingsButton.onClick.AddListener(() => OpenSettings());
+
+        _quitButton.onClick.AddListener(() => QuitGame());
+    }
+
+    private void QuitGame()
+    {
+        _mainMenu.SetActive(true);
+        _gameplay.SetActive(false);
+        onQuitPressedDelegate?.Invoke();
     }
 
     private void OpenSettings()
@@ -45,6 +61,6 @@ public class UIManager : Singleton<UIManager>
     {
         _mainMenu.SetActive(false);
         _gameplay.SetActive(true);
-        onStartPressedkDelegate?.Invoke();
+        onStartPressedDelegate?.Invoke();
     }
 }

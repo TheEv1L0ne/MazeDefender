@@ -21,21 +21,24 @@ public abstract class Unit : MonoBehaviour
 
     protected IEnumerator IMove = null;
 
+    protected IEnumerator acdr = null;
+
+    protected int currentHitPoints;
+
+    public bool IsAlive => currentHitPoints > 0;
+
     public void Init((int, int) atIndex, UnitData data)
     {
         Data = data;
         startNode = MazeManager.Instance.Maze.mazeMatrix[atIndex.Item1, atIndex.Item2];
         endNode = null;
+
+        currentHitPoints = Data.HitPoints;
     }
 
     public virtual void ExecuteUnitState()
     {
 
-    }
-
-    protected void PlayAnim(string animName)
-    {
-        _animator.Play(animName);
     }
 
     protected virtual void Attack()
@@ -103,6 +106,35 @@ public abstract class Unit : MonoBehaviour
 
         isMoving = false;
         endNode = null;
+    }
+
+    protected void CheckCooldown()
+    {
+        if (acdr == null)
+        {
+            acdr = AttackCooldown();
+            StartCoroutine(acdr);
+        }
+    }
+
+    protected IEnumerator AttackCooldown()
+    {
+        attackTimer = Data.AttackCooldown;
+        Attack();
+        while (attackTimer > 0)
+        {
+            attackTimer -= Time.deltaTime;
+            yield return null;
+        }
+
+        attackTimer = Data.AttackCooldown;
+
+        acdr = null;
+    }
+
+    protected void PlayAnim(string animName)
+    {
+        _animator.Play(animName);
     }
 
     public virtual void AdjustCamera()

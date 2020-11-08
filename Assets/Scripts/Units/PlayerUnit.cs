@@ -4,11 +4,7 @@ using UnityEngine;
 
 public class PlayerUnit : Unit
 {
-
-    public MazeNode toNode = null;
-    public bool IsMoving { get => isMoving; set => isMoving = value; }
-
-    private Unit enemy;
+    private Unit _enemy;
 
     public override void AdjustCamera()
     {
@@ -19,15 +15,10 @@ public class PlayerUnit : Unit
     {
         if(endNode == null)
         {
-            enemy = GetClosestEnemy();
-            if (enemy != null)
+            _enemy = GetClosestEnemy();
+            if (_enemy != null)
             {
-                if (acdr == null)
-                {
-                    Debug.Log("true");
-                    acdr = AttackCooldown();
-                    StartCoroutine(acdr);
-                }
+                CheckCooldown();
             }
         }
     }
@@ -39,26 +30,9 @@ public class PlayerUnit : Unit
         SpawnProjectile(transform.position);
     }
 
-    IEnumerator acdr = null;
-
-    private IEnumerator AttackCooldown()
-    {
-        attackTimer = Data.AttackCooldown;
-        Attack();
-        while (attackTimer > 0)
-        {
-            attackTimer -= Time.deltaTime;
-            yield return null;
-        }
-
-        attackTimer = Data.AttackCooldown;
-
-        acdr = null;
-    }
-
     private void SpawnProjectile(Vector3 atLocation)
     {
-        GameObject projectile = Instantiate(GameManager.Instance.Projectile);
+        GameObject projectile = Instantiate(GameManager.Instance.ProjectilePlayer);
         projectile.transform.position = atLocation;
         Projectile p = projectile.GetComponent<Projectile>();
 
@@ -67,7 +41,7 @@ public class PlayerUnit : Unit
             3f,
             Data.AttackDamage,
             ProjectileTargetType.Enemy,
-            enemy.transform.position);
+            _enemy);
 
         p.Fly();
     }

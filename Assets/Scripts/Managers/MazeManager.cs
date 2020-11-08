@@ -66,4 +66,12 @@ public class MazeManager : Singleton<MazeManager>
         gameObject.GetComponent<SpriteRenderer>().color = Color.blue;
     }
 
+    public void ClearMaze()
+    {
+        for (int i = _mazeGraphicsHolder.childCount - 1; i >= 0; i--)
+        {
+            Destroy(_mazeGraphicsHolder.GetChild(i).gameObject);
+        }
+    }
+
 }

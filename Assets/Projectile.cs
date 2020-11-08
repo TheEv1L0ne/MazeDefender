@@ -9,6 +9,7 @@ public class Projectile : MonoBehaviour
     private ProjectileTargetType _targetType;
     private Vector3 _targetPos;
     private int _damage;
+    private Unit _enemyUnit = null;
 
     public void Init(float withDistance, float withSpeed, int withDamage, ProjectileTargetType withTargetType, Vector3 targetPos)
     {
@@ -16,6 +17,16 @@ public class Projectile : MonoBehaviour
         _targetType = withTargetType;
         _speed = withSpeed;
         _targetPos = targetPos;
+        _damage = withDamage;
+    }
+
+    public void Init(float withDistance, float withSpeed, int withDamage, ProjectileTargetType withTargetType, Unit enemyUnit)
+    {
+        _distance = withDistance;
+        _targetType = withTargetType;
+        _speed = withSpeed;
+        _targetPos = enemyUnit.transform.position;
+        _enemyUnit = enemyUnit;
         _damage = withDamage;
     }
 
@@ -72,6 +83,8 @@ public class Projectile : MonoBehaviour
         if (collision.tag == "Enemy" && _targetType == ProjectileTargetType.Enemy)
         {
             StopAllCoroutines();
+
+            (_enemyUnit as EnemyUnit).TakeDamaga(_damage);
 
             Destroy(this.gameObject);
         }

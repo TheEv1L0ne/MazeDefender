@@ -4,6 +4,9 @@ using UnityEngine;
 
 public class EnemyUnit : Unit
 {
+    [SerializeField] private SpriteRenderer hpBar;
+    [SerializeField] private Gradient _gradient;
+
     public override void ExecuteUnitState()
     {
 
@@ -28,29 +31,8 @@ public class EnemyUnit : Unit
                 Stop();
             }
 
-            if (acdr == null)
-            {
-                acdr = AttackCooldown();
-                StartCoroutine(acdr);
-            }
+            CheckCooldown();
         }
-    }
-
-    IEnumerator acdr = null;
-
-    private IEnumerator AttackCooldown()
-    {
-        attackTimer = Data.AttackCooldown;
-        Attack();
-        while (attackTimer > 0)
-        {
-            attackTimer -= Time.deltaTime;
-            yield return null;
-        }
-
-        attackTimer = Data.AttackCooldown;
-
-        acdr = null;
     }
 
     private void Stop()
@@ -71,10 +53,10 @@ public class EnemyUnit : Unit
 
         bool playerInRange = CheckIfInRange(GameManager.Instance.PlayerPos);
 
-        SpawnProjectile(transform.position, playerInRange ? 1 : 0);
+        SpawnEnemyProjectile(transform.position, playerInRange ? 1 : 0);
     }
 
-    private void SpawnProjectile(Vector3 atLocation, int withTarget)
+    private void SpawnEnemyProjectile(Vector3 atLocation, int withTarget)
     {
         GameObject projectile = Instantiate(GameManager.Instance.Projectile);
         projectile.transform.position = atLocation;
@@ -115,5 +97,24 @@ public class EnemyUnit : Unit
         }
 
         return noWallsBetween;
+    }
+
+    public void TakeDamaga(int damage)
+    {
+        currentHitPoints -= damage;
+        SetHPBarColor(currentHitPoints);
+    }
+
+    private void SetHPBarColor(int currentHp)
+    {
+        float x = (float)currentHp / (float)Data.HitPoints;
+
+        if(this != null)
+            hpBar.color = _gradient.Evaluate(x);
+    }
+
+    public void OnDestroy()
+    {
+        StopAllCoroutines();
     }
 }
