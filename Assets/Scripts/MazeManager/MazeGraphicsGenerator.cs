@@ -13,6 +13,7 @@ public class MazeGraphicsGenerator
             {
                 GameObject tile = TilePoolManager.Instance.GetTileFromPool();
                 tile.transform.parent = mazeHolder;
+                tile.name = $"Maze[{i}][{j}] ";
 
                 float offset = 0.5f;
 

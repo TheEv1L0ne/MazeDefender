@@ -7,34 +7,36 @@ using UnityEngine.Experimental.UIElements;
 
 public class GameManager : Singleton<GameManager>
 {
-
+    #region EditorReferences
     [SerializeField] private GameObject _playerObjectPrefab;
     [SerializeField] private GameObject _enemyObjectPrefab;
     [SerializeField] private GameObject _cityObject;
-
     [SerializeField] private GameObject _projectile;
-    public GameObject Projectile { get => _projectile; }
-
     [SerializeField] private GameObject _projectilePlayer;
-    public GameObject ProjectilePlayer { get => _projectilePlayer; }
+    #endregion
 
+    #region private variables
     private Maze _maze;
     private Unit _playerUnit;
-    public Unit PlayerUnit => _playerUnit;
-
     private List<Unit> _enemyUnits;
-    public List<Unit> EnemyUnits => _enemyUnits;
-
     private PlayerBase _playerBase;
-    public PlayerBase PlayerBase => _playerBase;
+    private MazeNode _cityNode = null;
+    private List<Unit> _deadUnits = new List<Unit>();
+    private bool _gameInProgress = false;
+    #endregion
 
-    MazeNode _cityNode = null;
+    #region Getters
+    public GameObject Projectile { get => _projectile; }
+    public GameObject ProjectilePlayer { get => _projectilePlayer; }
+    public Unit PlayerUnit => _playerUnit;
+    public List<Unit> EnemyUnits => _enemyUnits;
+    public PlayerBase PlayerBase => _playerBase;
     public Vector3 CityPos => _cityNode.NodePosition;
     public Vector3 PlayerPos => _playerUnit.transform.position;
     public MazeNode CityNode => _cityNode;
+    #endregion
 
-    private List<Unit> _deadUnits = new List<Unit>();
-
+    #region Unit Mono Functions
     private void OnEnable()
     {
         UIManager.onStartPressedDelegate += OnStart;
@@ -46,6 +48,7 @@ public class GameManager : Singleton<GameManager>
         UIManager.onStartPressedDelegate -= OnStart;
         UIManager.onQuitPressedDelegate -= OnQuit;
     }
+    #endregion
 
     private void OnQuit()
     {
@@ -67,6 +70,7 @@ public class GameManager : Singleton<GameManager>
         InitGame();
     }
 
+    #region GAME PLAY
     private void InitGame()
     {
         MazeManager.Instance.GenerateMaze();     
@@ -74,10 +78,12 @@ public class GameManager : Singleton<GameManager>
 
         _deadUnits = new List<Unit>();
 
-        SpawnBase(MazeManager.Instance.GetEmptyNodeIndex());
+        //Base
+        (int, int) baseSpawnIndex = MazeManager.Instance.GetEmptyNodeIndex();
+        SpawnBase(baseSpawnIndex);
 
-        (int, int) emptyTileIndex = MazeManager.Instance.GetEmptyNodeIndex();
-
+        //player
+        (int, int) playerSpawnIndex = MazeManager.Instance.GetEmptyCloseTo(baseSpawnIndex);
         UnitData data = new UnitData()
         {
             HitPoints = 200,
@@ -87,16 +93,17 @@ public class GameManager : Singleton<GameManager>
             AttackDistance = 4,
             AttackRange = 4
         };
+        _playerUnit = SpawnUnit(_playerObjectPrefab, playerSpawnIndex, data);
+        UIManager.Instance.playUI.SetPlayerHp(_playerUnit.Data.HitPoints, _playerUnit.Data.HitPoints);
 
-        _playerUnit = SpawnUnit(_playerObjectPrefab, emptyTileIndex, data);
-
+        //Enemies
         _enemyUnits = new List<Unit>();
         for (int i = 0; i < 5; i++)
         {
             UnitData withData = new UnitData()
             {
                 HitPoints = 100,
-                AttackDamage = 10,
+                AttackDamage = 20,
                 MovementSpeed = 2,
                 AttackCooldown = 3,
                 AttackDistance = 4,
@@ -106,21 +113,25 @@ public class GameManager : Singleton<GameManager>
             Unit enemy = SpawnUnit(_enemyObjectPrefab, MazeManager.Instance.GetEmptyNodeIndex(), withData);
             _enemyUnits.Add(enemy);
         }
+        UIManager.Instance.playUI.SetEnemiesLeft(_enemyUnits.Count);
 
-        CameraManager.Instance.InitCameraAtLocation(emptyTileIndex);
+        //Player camera
+        CameraManager.Instance.InitCameraAtLocation(playerSpawnIndex);
 
+        _gameInProgress = true;
         StartCoroutine(GameLoop());
     }
 
     private IEnumerator GameLoop()
     {
-        while(true)
+        while (_gameInProgress)
         {
-            if (!PlayerBase.IsAlive)
+            if (!PlayerBase.IsAlive || !PlayerUnit.IsAlive || _enemyUnits.Count == 0)
             {
-                FinishGame();
+                FinishGame(_enemyUnits.Count == 0);
             }
 
+            UIManager.Instance.playUI.SetEnemiesLeft(_enemyUnits.Count);
             foreach (var item in _enemyUnits)
             {
 
@@ -139,6 +150,8 @@ public class GameManager : Singleton<GameManager>
                 mousePos = CameraManager.Instance.MainCamera.ScreenToWorldPoint(mousePos);
                 mousePos.z = 0f;
 
+                Debug.Log($"ENEMY POS {mousePos}");
+
                 RaycastHit2D hit = Physics2D.Raycast(mousePos, -Vector2.up, 0f);
                 {
                     if (hit.collider != null)
@@ -146,6 +159,8 @@ public class GameManager : Singleton<GameManager>
                         int arrayIndex = hit.transform.GetSiblingIndex();
                         int x = arrayIndex / MazeManager.Instance.Maze.MazeSizeY;
                         int y = arrayIndex % MazeManager.Instance.Maze.MazeSizeY;
+
+                        Debug.Log($"PLAUYER POS {x} {y}");
 
                         MazeNode clickedNode = MazeManager.Instance.GetNode(x, y);
 
@@ -172,11 +187,14 @@ public class GameManager : Singleton<GameManager>
         }
     }
 
-    private void FinishGame()
+    private void FinishGame(bool won)
     {
-        throw new NotImplementedException();
+        _gameInProgress = false;
+        UIManager.Instance.playUI.SetGameEndState(true, won);
     }
+    #endregion
 
+    #region SPAWNING
     private Unit SpawnUnit(GameObject fromPrefab, (int, int) atIndex, UnitData withData = null)
     {
 
@@ -211,4 +229,5 @@ public class GameManager : Singleton<GameManager>
         _playerBase = baseObject.GetComponent<PlayerBase>();
         _playerBase.Init(200, atIndex);
     }
+    #endregion
 }

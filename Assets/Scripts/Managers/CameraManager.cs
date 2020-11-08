@@ -32,8 +32,6 @@ public class CameraManager : Singleton<CameraManager>
         _right = mazeX - x;
         _bottom = -mazeY + y;
 
-        Debug.Log($"left {_left} top {_top} right {_right} bottom {_bottom}");
-
         UpdateCameraPos(pos);
     }
 

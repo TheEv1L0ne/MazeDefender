@@ -18,6 +18,7 @@ public class EnemyUnit : Unit
             if (!isMoving)
             {
                 isMoving = true;
+                startNode = GetCurrentTile();
                 Move(GameManager.Instance.CityNode);
             }
         }
@@ -116,5 +117,15 @@ public class EnemyUnit : Unit
     public void OnDestroy()
     {
         StopAllCoroutines();
+    }
+
+    private MazeNode GetCurrentTile()
+    { 
+        int x = Mathf.Abs((int)transform.position.x);
+        int y = Mathf.Abs((int)transform.position.y);
+
+        MazeNode clickedNode = MazeManager.Instance.GetNode(x, y);
+
+        return clickedNode;
     }
 }

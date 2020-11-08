@@ -49,7 +49,7 @@ public abstract class Unit : MonoBehaviour
     public void Move(MazeNode toNode)
     {
         if (endNode == null || (endNode != toNode))
-        {     
+        {           
             endNode = toNode;
 
             PathFinding aStar = new AStarPathfinding();
@@ -141,4 +141,5 @@ public abstract class Unit : MonoBehaviour
     {
 
     }
+    
 }

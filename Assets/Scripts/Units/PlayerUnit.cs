@@ -91,6 +91,8 @@ public class PlayerUnit : Unit
 
     public void TakeDamage(int damage)
     {
+        currentHitPoints -= damage;
 
+        UIManager.Instance.playUI.SetPlayerHp(currentHitPoints, Data.HitPoints);
     }
 }

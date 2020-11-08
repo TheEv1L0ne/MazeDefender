@@ -53,6 +53,35 @@ public class MazeManager : Singleton<MazeManager>
         return (x,y);
     }
 
+    public (int, int) GetEmptyCloseTo((int, int) index)
+    {
+        bool spawnLocGood = false;
+
+        int x = -1;
+        int y = -1;
+
+        int distanceFromTile = 3;
+
+        int xMin = Mathf.Clamp(index.Item1 - distanceFromTile, 0, index.Item1 - distanceFromTile);
+        int xMax = Mathf.Clamp(index.Item1 + distanceFromTile, index.Item1 + distanceFromTile, _maze.MazeSizeX);
+
+        int yMin = Mathf.Clamp(index.Item2 - distanceFromTile, 0, index.Item2 - distanceFromTile);
+        int yMax = Mathf.Clamp(index.Item2 + distanceFromTile, index.Item2 + distanceFromTile, _maze.MazeSizeY);
+
+        while (!spawnLocGood)
+        {
+            x = Random.Range(xMin, xMax);
+            y = Random.Range(yMin, yMax);
+
+            if (_maze.mazeMatrix[x, y].Type == MazeNode.TileType.Ground)
+            {
+                spawnLocGood = true;
+            }
+        }
+
+        return (x, y);
+    }    
+
     public MazeNode GetNode(int atX, int atY)
     {
         return _maze.mazeMatrix[atX, atY];
