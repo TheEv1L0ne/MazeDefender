@@ -32,8 +32,6 @@ public class Projectile : MonoBehaviour
 
     public void Fly()
     {
-        Debug.Log(_targetType);
-
         StartCoroutine(IFly());
     }
 
@@ -76,6 +74,8 @@ public class Projectile : MonoBehaviour
         if(collision.tag == "Player" && _targetType == ProjectileTargetType.Player)
         {
             StopAllCoroutines();
+
+            (GameManager.Instance.PlayerUnit as PlayerUnit).TakeDamage(_damage);
 
             Destroy(this.gameObject);
         }
