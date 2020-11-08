@@ -38,7 +38,8 @@ public class AStarPathfinding : PathFinding
 			foreach (MazeNode neighbour in _maze.GetNeighbours(node))
 			{
 				if ((neighbour.Type != MazeNode.TileType.Ground 
-					 && neighbour.Type != MazeNode.TileType.City)
+					 && neighbour.Type != MazeNode.TileType.City
+					 && neighbour.Type != MazeNode.TileType.Passage)
 					|| closedSet.Contains(neighbour))
 				{
 					continue;
