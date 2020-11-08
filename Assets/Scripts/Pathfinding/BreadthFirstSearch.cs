@@ -8,8 +8,6 @@ public class BreadthFirstSearch : PathFinding
     int ROW = 9;
     int COL = 10;
 
-    // These arrays are used to get row and column
-    // numbers of 4 neighbours of a given cell
     static int[] rowNum = { -1, 0, 0, 1, -1, -1, 1, 1 };
     static int[] colNum = { 0, -1, 1, 0, -1, 1, -1, 1 };
 
@@ -17,8 +15,6 @@ public class BreadthFirstSearch : PathFinding
 
     public override void FindPath()
     {
-        Debug.Log("FIND PATH RECURSIVE");
-
         ROW = _maze.MazeSizeX;
         COL = _maze.MazeSizeY;
 
@@ -68,7 +64,7 @@ public class BreadthFirstSearch : PathFinding
     };
 
 
-    bool isValid(int row, int col)
+   private bool IsValid(int row, int col)
     {
         return (row >= 0) && (row < ROW) &&
                (col >= 0) && (col < COL);
@@ -111,7 +107,7 @@ public class BreadthFirstSearch : PathFinding
                 int row = mazeNode.NodeX + rowNum[i];
                 int col = mazeNode.NodeY + colNum[i];
 
-                if (isValid(row, col) 
+                if (IsValid(row, col) 
                     && (_maze.mazeMatrix[row, col].Type == MazeNode.TileType.Ground
                         || _maze.mazeMatrix[row, col].Type == MazeNode.TileType.Passage
                         || _maze.mazeMatrix[row, col].Type == MazeNode.TileType.City) 

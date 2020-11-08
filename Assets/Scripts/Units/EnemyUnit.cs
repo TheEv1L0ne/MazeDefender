@@ -7,11 +7,17 @@ public class EnemyUnit : Unit
     [SerializeField] private SpriteRenderer hpBar;
     [SerializeField] private Gradient _gradient;
 
+
+    bool playerInRange = false;
+    bool baseinRange = false;
+
     public override void ExecuteUnitState()
     {
+        playerInRange = CheckIfInRange(GameManager.Instance.PlayerPos);
+        baseinRange = CheckIfInRange(GameManager.Instance.CityPos);
 
-        if (!CheckIfInRange(GameManager.Instance.CityPos)
-            && !CheckIfInRange(GameManager.Instance.PlayerPos))
+        if (!playerInRange
+            && !baseinRange)
         {       
             isAttacking = false;
 
@@ -52,8 +58,6 @@ public class EnemyUnit : Unit
     {
         PlayAnim(ATTACK);
 
-        bool playerInRange = CheckIfInRange(GameManager.Instance.PlayerPos);
-
         SpawnEnemyProjectile(transform.position, playerInRange ? 1 : 0);
     }
 
@@ -79,7 +83,7 @@ public class EnemyUnit : Unit
         var distance = heading.magnitude;
         var direction = heading / distance;
 
-        bool noWallsBetween = distance <= 3;
+        bool noWallsBetween = distance <= 4;
 
         if (noWallsBetween)
         {
@@ -92,7 +96,10 @@ public class EnemyUnit : Unit
                     int y = arrayIndex % MazeManager.Instance.Maze.MazeSizeY;
 
                     if (MazeManager.Instance.Maze.mazeMatrix[x, y].Type == MazeNode.TileType.Wall)
+                    {
+
                         noWallsBetween = false;
+                    }
                 }
             }
         }

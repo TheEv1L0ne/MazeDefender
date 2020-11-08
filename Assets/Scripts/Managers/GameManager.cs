@@ -37,6 +37,19 @@ public class GameManager : Singleton<GameManager>
     #endregion
 
     #region Unit Mono Functions
+    protected override void OnAwake()
+    {
+        int music = PlayerPrefs.GetInt(StaticPrefStrings.MUSIC, 1);
+        if (music == 1)
+        {
+            AudioManager.Instance.PlaySound(0);
+        }
+        else
+        {
+            AudioManager.Instance.StopSound(0);
+        }
+    }
+
     private void OnEnable()
     {
         UIManager.onStartPressedDelegate += OnStart;
@@ -98,7 +111,12 @@ public class GameManager : Singleton<GameManager>
 
         //Enemies
         _enemyUnits = new List<Unit>();
-        for (int i = 0; i < 5; i++)
+
+        int diff = PlayerPrefs.GetInt(StaticPrefStrings.DIFFICULTY, 0);
+
+        int numberOfBots = diff == 0 ? 10 : 20;
+
+        for (int i = 0; i < numberOfBots; i++)
         {
             UnitData withData = new UnitData()
             {
@@ -121,6 +139,7 @@ public class GameManager : Singleton<GameManager>
         _gameInProgress = true;
         StartCoroutine(GameLoop());
     }
+
 
     private IEnumerator GameLoop()
     {
@@ -150,8 +169,6 @@ public class GameManager : Singleton<GameManager>
                 mousePos = CameraManager.Instance.MainCamera.ScreenToWorldPoint(mousePos);
                 mousePos.z = 0f;
 
-                Debug.Log($"ENEMY POS {mousePos}");
-
                 RaycastHit2D hit = Physics2D.Raycast(mousePos, -Vector2.up, 0f);
                 {
                     if (hit.collider != null)
@@ -159,8 +176,6 @@ public class GameManager : Singleton<GameManager>
                         int arrayIndex = hit.transform.GetSiblingIndex();
                         int x = arrayIndex / MazeManager.Instance.Maze.MazeSizeY;
                         int y = arrayIndex % MazeManager.Instance.Maze.MazeSizeY;
-
-                        Debug.Log($"PLAUYER POS {x} {y}");
 
                         MazeNode clickedNode = MazeManager.Instance.GetNode(x, y);
 

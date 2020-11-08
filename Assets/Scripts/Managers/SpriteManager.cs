@@ -9,4 +9,8 @@ public class SpriteManager : Singleton<SpriteManager>
     public Sprite Passage;
 
     public Sprite Base;
+
+    [Header("ON OFF")]
+    public Sprite on;
+    public Sprite off;
 }

@@ -54,9 +54,10 @@ public abstract class Unit : MonoBehaviour
 
             PathFinding pathFinder;
 
-            int randomAlgorithm = Random.Range(0, 2);
+            //int randomAlgorithm = Random.Range(0, 2);
+            int randomAlgorithm = 0;
 
-            if (randomAlgorithm == 0)
+            if (randomAlgorithm == 1)
             {
                 pathFinder = new AStarPathfinding();
                 pathFinder.InitPathfinder(MazeManager.Instance.Maze, startNode, endNode);

@@ -56,22 +56,32 @@ public class UIManager : Singleton<UIManager>
 
     private void OpenMainMenu()
     {
+        if (PlayerPrefs.GetInt(StaticPrefStrings.SOUND, 1) == 1)
+            AudioManager.Instance.PlaySound(1);
+
         _mainMenu.SetActive(true);
         _settings.SetActive(false);
     }
 
     private void QuitGame()
     {
+        if (PlayerPrefs.GetInt(StaticPrefStrings.SOUND, 1) == 1)
+            AudioManager.Instance.PlaySound(1);
+
         _mainMenu.SetActive(true);
         _gameplay.SetActive(false);
 
         playUI.SetGameEndState(false);
 
         onQuitPressedDelegate?.Invoke();
+
     }
 
     private void OpenSettings()
     {
+        if (PlayerPrefs.GetInt(StaticPrefStrings.SOUND, 1) == 1)
+            AudioManager.Instance.PlaySound(1);
+
         _mainMenu.SetActive(false);
         _settings.SetActive(true);
     }
@@ -83,6 +93,9 @@ public class UIManager : Singleton<UIManager>
 
     private void StartGame()
     {
+        if (PlayerPrefs.GetInt(StaticPrefStrings.SOUND, 1) == 1)
+            AudioManager.Instance.PlaySound(1);
+
         _mainMenu.SetActive(false);
         _gameplay.SetActive(true);
         playUI.SetGameEndState(false);
