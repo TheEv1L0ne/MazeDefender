@@ -54,8 +54,7 @@ public abstract class Unit : MonoBehaviour
 
             PathFinding pathFinder;
 
-            //int randomAlgorithm = Random.Range(0, 2);
-            int randomAlgorithm = 0;
+            int randomAlgorithm = 1;
 
             if (randomAlgorithm == 1)
             {
