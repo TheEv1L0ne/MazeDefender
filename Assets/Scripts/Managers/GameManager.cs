@@ -114,7 +114,7 @@ public class GameManager : Singleton<GameManager>
 
         int diff = PlayerPrefs.GetInt(StaticPrefStrings.DIFFICULTY, 0);
 
-        int numberOfBots = diff == 0 ? 10 : 20;
+        int numberOfBots = diff == 0 ? 6 : 14;
 
         for (int i = 0; i < numberOfBots; i++)
         {
@@ -190,12 +190,11 @@ public class GameManager : Singleton<GameManager>
 
             _playerUnit.ExecuteUnitState();
 
-            foreach (var item in _deadUnits)
-            {        
-                if(item != null)
-                    Destroy(item.gameObject);
-
-                _enemyUnits.Remove(item);
+;            for (int i = _deadUnits.Count-1; i >= 0; i--)
+            {
+                Destroy(_deadUnits[i].gameObject);
+                _enemyUnits.Remove(_deadUnits[i]);
+                _deadUnits.Remove(_deadUnits[i]);
             }
             
             yield return null;
